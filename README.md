@@ -97,17 +97,11 @@ Demo preparation
 Deliverable by 1 PM
 
 ✅ Route Search
-
 ✅ AI Route Recommendation
-
 ✅ Fare Calculation
-
 ✅ Crowd Indicator
-
 ✅ Alternative Routes
-
 ✅ Interactive Map
-
 ✅ Working Demo
 
 Tech Stack
@@ -158,6 +152,6 @@ AI Engineer
 Gemini Integration
 Recommendation Logic
 
-Project Pitch (30 Seconds)
+Project Pitch
 
 "Hyderabad Smart Public Transport Planner is an AI-powered commuting assistant that helps citizens find the fastest, cheapest, and least crowded bus and metro routes in real time. By combining route optimization, fare comparison, crowd estimation, and intelligent recommendations, it makes daily travel in Hyderabad more efficient and convenient."
