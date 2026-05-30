@@ -57,4 +57,8 @@ An AI-powered multi-modal journey planning platform tailored for Hyderabad commu
        └──────────────────────────┘
 
 
-       THe link is:  http://127.0.0.1:5500/index.html
+## Local Preview
+
+Run the project locally and open:
+
+http://127.0.0.1:5500/index.html
