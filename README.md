@@ -8,7 +8,7 @@ An AI-powered multi-modal journey planning platform tailored for Hyderabad commu
 
 | Field | Details |
 | :--- | :--- |
-| **Team Name** | Eclipse / NEXORA |
+| **Team Name** |Trail Blazers |
 | **Focus Area** | City Level – Hyderabad |
 | **Problem Statement** | Commuters in Hyderabad rely on multiple disconnected apps (Google Maps, TSRTC App, Metro App) for transport information. Existing solutions provide standalone route navigation but fail to effectively combine multi-modal routing (Bus + Metro), real-time delays, crowd estimation, fare comparisons, and alternative route recommendations. This gaps leads to increased journey planning times, unexpected delays, and overcrowding exposure. |
 | **Proposed Solution** | An AI-powered journey planning platform that helps users seamlessly plan travel combining TSRTC buses and the Hyderabad Metro. Users enter their source and destination, and the platform surfaces optimized travel choices filtered by four core pillars: **Fastest**, **Cheapest**, **Least Crowded**, and **Eco-friendly** routes. |
