@@ -1,157 +1,57 @@
-Hyderabad Smart Public Transport Planner
-Focus Area
+# Hyderabad Smart Public Transport Planner
 
-City Level – Hyderabad
+An AI-powered multi-modal journey planning platform tailored for Hyderabad commuters. This solution integrates TSRTC buses and Hyderabad Metro services to provide real-time, optimized travel options based on speed, cost, and crowd levels.
 
-Hyderabad's public transportation system includes TSRTC buses and Hyderabad Metro. Daily commuters often struggle to identify the best route due to traffic congestion, route changes, delays, and lack of crowd information.
+---
 
-Problem Statement
+## 📌 Submission Overview
 
-Commuters in Hyderabad rely on multiple apps and sources for transport information. Existing solutions provide route guidance but do not effectively combine:
+| Field | Details |
+| :--- | :--- |
+| **Team Name** | Eclipse / NEXORA |
+| **Focus Area** | City Level – Hyderabad |
+| **Problem Statement** | Commuters in Hyderabad rely on multiple disconnected apps (Google Maps, TSRTC App, Metro App) for transport information. Existing solutions provide standalone route navigation but fail to effectively combine multi-modal routing (Bus + Metro), real-time delays, crowd estimation, fare comparisons, and alternative route recommendations. This gaps leads to increased journey planning times, unexpected delays, and overcrowding exposure. |
+| **Proposed Solution** | An AI-powered journey planning platform that helps users seamlessly plan travel combining TSRTC buses and the Hyderabad Metro. Users enter their source and destination, and the platform surfaces optimized travel choices filtered by four core pillars: **Fastest**, **Cheapest**, **Least Crowded**, and **Eco-friendly** routes. |
+| **Existing Solutions** | • **Google Maps:** Focuses primarily on point-to-point navigation and general schedules.<br>• **TSRTC Official App:** Limited to bus schedules without real-time synchronization or multi-modal transfers.<br>• **Hyderabad Metro Rail App:** Isolated metro routes and fare calculations only. |
+| **Unique Value Prop** | 1. **Crowd Estimation:** Predicts transit crowd levels using historical patterns and simulated occupancy data.<br>2. **Multi-Criteria Routing:** Offers granular routes prioritized by budget, speed, or comfort instead of a single default line.<br>3. **Bus + Metro Integration:** Provides seamless, end-to-end multi-modal connections.<br>4. **AI Travel Assistant:** Powered by the Gemini API to answer natural language queries (e.g., *"I need to reach HITEC City by 9 AM with minimum cost"*).<br>5. **Dynamic Delay Alerts:** Notifies users of sudden disruptions and suggests immediate live alternatives. |
+| **Tech Stack** | • **Frontend:** React + Vite + Tailwind CSS<br>• **Backend:** Flask / FastAPI<br>• **Database:** PostgreSQL / MongoDB<br>• **Maps:** OpenStreetMap / Google Maps API<br>• **AI Integration:** Gemini API<br>• **Charts:** Chart.js<br>• **Authentication:** JWT<br>• **Deployment:** Vercel + Render<br>• **Version Control:** GitHub |
 
-Bus and Metro routes
-Real-time delays
-Crowd estimation
-Fare comparison
-Alternative route recommendations
+---
 
-As a result, commuters spend more time planning journeys and often experience delays and overcrowding.
+## 🛠️ System Architecture
 
-Proposed Solution
-
-The Hyderabad Smart Public Transport Planner is an AI-powered journey planning platform that helps users choose the:
-
-Fastest route
-Cheapest route
-Least crowded route
-Eco-friendly route
-
-Users simply enter source and destination, and the system provides optimized travel options combining TSRTC buses and Hyderabad Metro.
-
-Existing Solutions
-Google Maps
-TSRTC Official App
-Hyderabad Metro Rail App
-
-These solutions primarily focus on route navigation and schedules.
-
-What Unique Problems Does Our Solution Solve?
-Crowd Estimation
-
-Predicts crowd levels using historical and simulated occupancy data.
-
-Multi-Criteria Route Planning
-
-Instead of only the fastest route, users can choose:
-
-Fastest
-Cheapest
-Least Crowded
-Balanced Route
-Bus + Metro Integration
-
-Provides seamless multimodal journey planning.
-
-AI Travel Assistant
-
-Users can ask:
-
-"I need to reach HITEC City by 9 AM with minimum cost"
-
-and receive intelligent recommendations.
-
-Delay Alerts
-
-Notifies users of route disruptions and suggests alternatives.
-
-Hyderabad-Specific Focus
-
-Tailored for local TSRTC and Metro commuters.
-
-MVP Plan (Complete by 1 PM Tomorrow)
-Tonight
-Frontend
-Create homepage
-Source/Destination search
-Route cards
-Interactive map
-Backend
-Route API
-Sample transport dataset
-Fare calculation
-AI Module
-Gemini integration
-Route recommendation engine
-Tomorrow Morning
-Features
-Crowd estimation
-Delay simulation
-Route comparison
-Dashboard
-Popular routes
-Average travel time
-Congestion statistics
-Testing
-End-to-end user flow
-Demo preparation
-Deliverable by 1 PM
-
-✅ Route Search
-✅ AI Route Recommendation
-✅ Fare Calculation
-✅ Crowd Indicator
-✅ Alternative Routes
-✅ Interactive Map
-✅ Working Demo
-
-Tech Stack
-Layer	Technology
-Frontend	React + Vite + Tailwind CSS
-Backend	Flask / FastAPI
-Database	PostgreSQL / MongoDB
-Maps	OpenStreetMap / Google Maps API
-AI	Gemini API
-Charts	Chart.js
-Authentication	JWT
-Deployment	Vercel + Render
-Version Control	GitHub
-Suggested Architecture
-User Input
-(Source + Destination)
-        |
-        v
-Route Engine
-        |
-        +---- Fare Calculator
-        |
-        +---- Crowd Estimator
-        |
-        +---- Delay Predictor
-        |
-        v
-Gemini AI Recommendation
-        |
-        v
-Route Suggestions
-(Fastest / Cheapest / Least Crowded)
-        |
-        v
-Interactive Map & Dashboard
-Team Structure (3 Members)
-Product Lead
-Presentation
-Documentation
-Demo
-Frontend Developer 1
-Home Page
-Dashboard
-Backend Developer
-APIs
-Database
-AI Engineer
-Gemini Integration
-Recommendation Logic
-
-Project Pitch
-
-"Hyderabad Smart Public Transport Planner is an AI-powered commuting assistant that helps citizens find the fastest, cheapest, and least crowded bus and metro routes in real time. By combining route optimization, fare comparison, crowd estimation, and intelligent recommendations, it makes daily travel in Hyderabad more efficient and convenient."
+```text
+       ┌──────────────────────────┐
+       │        User Input        │
+       │   (Source/Destination)   │
+       └────────────┬─────────────┘
+                    │
+                    ▼
+       ┌──────────────────────────┐
+       │       Route Engine       │
+       └────────────┬─────────────┘
+                    │
+      ┌─────────────┼─────────────┐
+      ▼             ▼             ▼
+┌───────────┐ ┌───────────┐ ┌───────────┐
+│   Fare    │ │   Crowd   │ │   Delay   │
+│Calculator│ │ Estimator │ │ Predictor │
+└─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+      │             │             │
+      └─────────────┼─────────────┘
+                    │
+                    ▼
+       ┌──────────────────────────┐
+       │ Gemini AI Recommendation │
+       └────────────┬─────────────┘
+                    │
+                    ▼
+       ┌──────────────────────────┐
+       │    Route Suggestions     │
+       │(Fastest/Cheapest/Comfort)│
+       └────────────┬─────────────┘
+                    │
+                    ▼
+       ┌──────────────────────────┐
+       │ Interactive Map & Dash  │
+       └──────────────────────────┘
