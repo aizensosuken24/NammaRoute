@@ -68,7 +68,7 @@ An AI-powered multi-modal journey planning platform tailored for Hyderabad commu
 Run the project locally using Live Server and open:
 
 ```text
-https://namma-route-cyan.vercel.app/
+https://namma-route-fdxl.vercel.app/
 ```
 
 ---
