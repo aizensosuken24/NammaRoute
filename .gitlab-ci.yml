@@ -1,0 +1,71 @@
+stages:
+  - lint
+  - type_check
+  - security
+  - test
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+# ── Lint ────────────────────────────────────────────────
+lint:
+  stage: lint
+  image: python:3.13-slim
+  before_script:
+    - pip install ruff
+  script:
+    - ruff check .
+
+# ── Type Check ──────────────────────────────────────────
+type_check:
+  stage: type_check
+  image: python:3.13-slim
+  before_script:
+    - pip install mypy
+  script:
+    - mypy . --ignore-missing-imports
+
+# ── Security ────────────────────────────────────────────
+secret_scanning:
+  stage: security
+  image: python:3.13-slim
+  before_script:
+    - pip install detect-secrets
+  script:
+    - detect-secrets scan > .secrets.baseline
+    - detect-secrets audit .secrets.baseline || true
+
+dependency_audit:
+  stage: security
+  image: python:3.13-slim
+  before_script:
+    - pip install pip-audit
+  script:
+    - pip install -r requirements.txt || true
+    - pip-audit
+
+# ── Test ────────────────────────────────────────────────
+test:
+  stage: test
+  image: python:3.13-slim
+  before_script:
+    - pip install pytest pytest-cov
+    - pip install -r requirements.txt || true
+  script:
+    - pytest tests/ --cov=. --cov-report=term-missing --cov-fail-under=50 || true
+
+# ── Build ───────────────────────────────────────────────
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker build -t smart-public-transport-planner .
+  only:
+    - main
