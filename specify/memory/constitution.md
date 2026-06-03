@@ -11,9 +11,3 @@ NammaRoute is an AI-powered smart public transport planner for Hyderabad commute
 
 ## Scope
 City-level solution for Hyderabad, India.
-
-## Tech Stack
-- Frontend: HTML, CSS, JavaScript
-- AI: Claude API
-- Maps: Leaflet.js + OpenStreetMap
-- CI/CD: GitLab CI, Pre-commit Hooks
