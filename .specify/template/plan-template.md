@@ -15,6 +15,3 @@ What we are planning to build.
 
 ## Risks
 - Risk 1
-
-## Success Metrics
-- Metric 1
