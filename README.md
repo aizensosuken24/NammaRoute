@@ -142,10 +142,25 @@ This project is licensed under the MIT License — see [LICENSE](LICENSE) for de
 
 ---
 
-## 👤 Author
+---
 
-**Anirudh R Rao** — [@Anirudh24](https://code.swecha.org/Anirudh24)
+## 📋 About Project
+
+| Field | Details |
+|-------|---------|
+| **Team Name** | Trail Blazers |
+| **Focus Area** | City Level – Hyderabad |
+| **Problem Statement** | Commuters in Hyderabad rely on multiple disconnected apps (Google Maps, TSRTC App, Metro App). Existing solutions fail to combine multi-modal routing, real-time delays, crowd estimation, fare comparisons, and alternative route recommendations. This leads to increased journey planning times, unexpected delays, and overcrowding exposure. |
+| **Proposed Solution** | An AI-powered journey planning platform that helps users plan travel combining TSRTC buses and Hyderabad Metro. Users enter source and destination, and the platform surfaces optimized travel choices filtered by four pillars: Fastest, Cheapest, Least Crowded, and Eco-friendly routes. |
+| **Existing Solutions** | Google Maps: point-to-point navigation only. TSRTC App: limited to bus schedules. Hyderabad Metro App: isolated metro routes only. |
+| **Unique Value Proposition** | 1. Crowd Estimation using historical patterns. 2. Multi-Criteria Routing by budget, speed, or comfort. 3. Bus + Metro Integration for end-to-end connections. 4. AI Travel Assistant powered by Claude API. 5. Dynamic Delay Alerts with live alternatives. |
+| **Tech Stack** | HTML, CSS, JavaScript, Claude API, Leaflet.js, OpenStreetMap, GitLab CI, Docker |
+| **Live Demo** | https://namma-route-fdxl.vercel.app/ |
 
 ---
 
-*Built with ❤️ for Hyderabad commuters*
+## 👥 Contributors
+
+| Contributor | Tasks |
+|-------------|-------|
+| @Anirudh24 | Project setup, routing engine, fare calculation (HMRL Metro + TSRTC Bus slabs), AI integration with Claude API, map visualization with Leaflet.js, UI/UX design, CI/CD pipeline setup, Docker configuration, documentation |
