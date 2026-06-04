@@ -1,15 +1,12 @@
 # Tasks Template
 
 ## Goal
-Brief description of sprint goal.
+Sprint goal description.
 
 ## Tasks
 - [ ] Task 1
 - [ ] Task 2
 - [ ] Task 3
-
-## In Progress
-- [ ] Task being worked on
 
 ## Done
 - [x] Completed task
