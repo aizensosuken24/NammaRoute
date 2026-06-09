@@ -1,280 +1,871 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NammaRoute — Hyderabad Smart Transit</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NammaRoute v3.0 — Hyderabad Smart Transit Routing</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <style>
+    :root {
+      --bg-dark: #060910;
+      --panel-bg: #0f1421;
+      --border-color: rgba(56, 189, 248, 0.15);
+      --border-focus: rgba(56, 189, 248, 0.4);
+      --text-main: #e2e8f5;
+      --text-muted: #6b7a99;
+      --primary: #38bdf8;
+      --secondary: #818cf8;
+      --emerald: #34d399;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Space Grotesk', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Background Canvas */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Top Navigation bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(6, 9, 16, 0.7);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-container h1 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 24px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-container span {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    #current-time {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--secondary);
+    }
+
+    /* Workspace Dashboard Layout */
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    /* Control Form Panel */
+    .search-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      margin-bottom: 40px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      flex: 1;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    select {
+      width: 100%;
+      background: #141a29;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    #swapBtn {
+      background: #1c2335;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 22px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    #swapBtn:hover {
+      background: var(--primary);
+      color: #000;
+      transform: rotate(180deg);
+    }
+
+    /* Option Pills Selection Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .pill-box-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .pills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill, .time-pill {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill:hover, .time-pill:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .pill.active, .time-pill.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+    }
+
+    #findRouteBtn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      color: #060910;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    #findRouteBtn:hover {
+      opacity: 0.95;
+    }
+
+    #findRouteBtn:active {
+      transform: scale(0.995);
+    }
+
+    /* Async Loading State View */
+    #loadingState {
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(56, 189, 248, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      margin: 0 auto 16px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #loadingState p {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* System Output / Result Dashboard Section */
+    .journey-banner {
+      background: linear-gradient(135deg, #101626, #090d16);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .jb-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .jb-arrow {
+      color: var(--primary);
+      font-family: var(--font-mono);
+    }
+
+    #jbMeta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .results-layout {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Route Cards Styles */
+    .cards-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .cards-header h3 {
+      font-size: 14px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    #routeCount {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    #routeCards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .route-card {
+      background: #0f1421;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      opacity: 0;
+      animation: cardFadeIn 0.4s ease forwards;
+    }
+
+    @keyframes cardFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .route-card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: #131a2b;
+    }
+
+    .route-card.selected {
+      border-color: var(--primary);
+      background: #141c30;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+      background: rgba(0,0,0,0.15);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .fare-val {
+      color: var(--emerald);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .crowd-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 2px;
+      margin-bottom: 6px;
+      overflow: hidden;
+    }
+
+    .crowd-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .crowd-fill.low { background: var(--emerald); width: 25%; }
+    .crowd-fill.medium { background: #fbbf24; width: 60%; }
+    .crowd-fill.high { background: #ef4444; width: 100%; }
+
+    .crowd-label {
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+    .crowd-label.low { color: var(--emerald); }
+    .crowd-label.medium { color: #fbbf24; }
+    .crowd-label.high { color: #ef4444; }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+    }
+
+    .tag.metro { background: rgba(56,189,248,0.1); color: var(--primary); }
+    .tag.bus { background: rgba(52,211,153,0.1); color: var(--emerald); }
+    .tag.walk { background: rgba(129,140,248,0.1); color: var(--secondary); }
+
+    /* Map & Journey Detail Columns */
+    .details-column {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    #map {
+      height: 380px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      background: #0d111b;
+    }
+
+    .journey-detail-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .journey-detail-panel h4 {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    #detailSteps {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Iterative Step Layout */
+    .step {
+      display: flex;
+      gap: 16px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 16px;
+      top: 32px;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .step-icon {
+      width: 34px;
+      height: 34px;
+      background: #141a29;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    .step-info {
+      flex: 1;
+      padding-top: 6px;
+    }
+
+    .step-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .step-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+    }
+
+    /* Claude AI Recommendation Section */
+    .ai-recommendation-panel {
+      background: linear-gradient(135deg, rgba(129,140,248,0.04), rgba(56,189,248,0.02));
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+    }
+
+    .ai-loading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .ai-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .ai-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--secondary);
+      border-radius: 50%;
+      animation: aiBounce 1.4s infinite ease-in-out both;
+    }
+
+    .ai-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .ai-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes aiBounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+
+    .ai-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #c8d1e5;
+    }
+
+    .ai-highlight {
+      color: var(--primary);
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
 
-  <canvas id="bgCanvas" class="bg-canvas"></canvas>
-  <div class="bg-gradient-overlay"></div>
-  <div class="noise-overlay"></div>
+  <canvas id="bgCanvas"></canvas>
 
-  <header class="header">
-    <div class="logo">
-      <div class="logo-mark">
-        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-          <circle cx="17" cy="17" r="16" stroke="url(#logoGrad)" stroke-width="1.5"/>
-          <circle cx="17" cy="17" r="6" fill="url(#logoGrad)"/>
-          <line x1="17" y1="1" x2="17" y2="8" stroke="url(#logoGrad)" stroke-width="1.5"/>
-          <line x1="17" y1="26" x2="17" y2="33" stroke="url(#logoGrad)" stroke-width="1.5"/>
-          <line x1="1" y1="17" x2="8" y2="17" stroke="url(#logoGrad)" stroke-width="1.5"/>
-          <line x1="26" y1="17" x2="33" y2="17" stroke="url(#logoGrad)" stroke-width="1.5"/>
-          <defs>
-            <linearGradient id="logoGrad" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#38bdf8"/>
-              <stop offset="100%" stop-color="#818cf8"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-      <div class="logo-text-group">
-        <span class="logo-text">Namma<span class="logo-accent">Route</span></span>
-        <span class="logo-sub">Hyderabad Transit</span>
-      </div>
+  <header>
+    <div class="logo-container">
+      <h1>NammaRoute</h1>
+      <span>HYDERABAD SMART TRANSIT · V3.0</span>
     </div>
-
-    <nav class="header-nav">
-      <button class="nav-pill active">🗺 Planner</button>
-      <button class="nav-pill" data-nav="status">📊 Live Status</button>
-      <button class="nav-pill" data-nav="fares">🎫 Fare Guide</button>
-    </nav>
-
-    <div class="header-meta">
-      <div class="live-indicator">
-        <span class="live-dot"></span>
-        <span class="live-label">LIVE</span>
-      </div>
-      <div class="clock-group">
-        <span id="current-time" class="header-time"></span>
-        <span class="header-city">Hyderabad, TS</span>
-      </div>
+    <div class="nav-actions">
+      <a class="nav-link" data-nav="status">Live Status</a>
+      <a class="nav-link" data-nav="fares">Fare Guide</a>
+      <div id="current-time">--:--:--</div>
     </div>
   </header>
 
-  <main class="main">
-    <section class="hero">
-      <div class="hero-eyebrow">
-        <span class="eyebrow-dot"></span>
-        SMART COMMUTE PLANNER · HYDERABAD
-        <span class="eyebrow-dot"></span>
-      </div>
-      <h1 class="hero-title">Navigate the city<br/><em>smarter.</em></h1>
-      <p class="hero-sub">
-        AI-powered multi-modal routing across Metro, TSRTC Bus & combined journeys — with real official fares & crowd intelligence.
-      </p>
-
-      <div class="hero-stats">
-        <div class="hstat"><span class="hstat-val">57</span><span class="hstat-label">Stations</span></div>
-        <div class="hstat-divider"></div>
-        <div class="hstat"><span class="hstat-val">3</span><span class="hstat-label">Metro Lines</span></div>
-        <div class="hstat-divider"></div>
-        <div class="hstat"><span class="hstat-val">₹10</span><span class="hstat-label">Min Fare</span></div>
-        <div class="hstat-divider"></div>
-        <div class="hstat"><span class="hstat-val">AI</span><span class="hstat-label">Powered</span></div>
-      </div>
-    </section>
-
+  <main>
     <section class="search-panel">
-      <div class="search-card">
-        <div class="search-card-label">PLAN YOUR JOURNEY</div>
+      <div class="input-row">
         <div class="input-group">
-          <div class="input-field">
-            <label class="input-label"><span class="dot dot-green"></span> FROM</label>
-            <div class="select-wrapper">
-              <select id="source" class="select-input">
-                <option value="">Select Origin</option>
-                <optgroup label="West / IT Corridor">
-                  <option value="Miyapur">Miyapur</option>
-                  <option value="JNTU College">JNTU College</option>
-                  <option value="KPHB Colony">KPHB Colony</option>
-                  <option value="Kukatpally">Kukatpally</option>
-                  <option value="HITEC City">HITEC City</option>
-                  <option value="Raidurg">Raidurg</option>
-                  <option value="Gachibowli (Bus Hub)">Gachibowli</option>
-                  <option value="Kondapur (Bus Hub)">Kondapur</option>
-                  <option value="Lingampally (Bus Hub)">Lingampally</option>
-                </optgroup>
-                <optgroup label="Central Hubs">
-                  <option value="Balanagar">Balanagar</option>
-                  <option value="Moosapet">Moosapet</option>
-                  <option value="Bharat Nagar">Bharat Nagar</option>
-                  <option value="Erragadda">Erragadda</option>
-                  <option value="Ameerpet">Ameerpet</option>
-                  <option value="S.R. Nagar">S.R. Nagar</option>
-                  <option value="Begumpet">Begumpet</option>
-                </optgroup>
-                <optgroup label="East / South / North">
-                  <option value="Secunderabad East">Secunderabad East</option>
-                  <option value="Paradise">Paradise</option>
-                  <option value="Nampally">Nampally</option>
-                  <option value="MG Bus Station">MG Bus Station (MGBS)</option>
-                  <option value="LB Nagar">LB Nagar</option>
-                  <option value="Dilsukhnagar">Dilsukhnagar</option>
-                  <option value="Uppal">Uppal</option>
-                </optgroup>
-              </select>
-              <span class="select-arrow">↓</span>
-            </div>
-          </div>
-
-          <button class="swap-btn" id="swapBtn" title="Swap Route">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M5 3L5 17M5 3L2 6M5 3L8 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M15 17L15 3M15 17L12 14M15 17L18 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <div class="input-field">
-            <label class="input-label"><span class="dot dot-red"></span> TO</label>
-            <div class="select-wrapper">
-              <select id="destination" class="select-input">
-                <option value="">Select Destination</option>
-                <optgroup label="West / IT Corridor">
-                  <option value="Miyapur">Miyapur</option>
-                  <option value="JNTU College">JNTU College</option>
-                  <option value="KPHB Colony">KPHB Colony</option>
-                  <option value="Kukatpally">Kukatpally</option>
-                  <option value="HITEC City">HITEC City</option>
-                  <option value="Raidurg">Raidurg</option>
-                  <option value="Gachibowli (Bus Hub)">Gachibowli</option>
-                  <option value="Kondapur (Bus Hub)">Kondapur</option>
-                  <option value="Lingampally (Bus Hub)">Lingampally</option>
-                </optgroup>
-                <optgroup label="Central Hubs">
-                  <option value="Balanagar">Balanagar</option>
-                  <option value="Moosapet">Moosapet</option>
-                  <option value="Bharat Nagar">Bharat Nagar</option>
-                  <option value="Erragadda">Erragadda</option>
-                  <option value="Ameerpet">Ameerpet</option>
-                  <option value="S.R. Nagar">S.R. Nagar</option>
-                  <option value="Begumpet">Begumpet</option>
-                </optgroup>
-                <optgroup label="East / South / North">
-                  <option value="Secunderabad East">Secunderabad East</option>
-                  <option value="Paradise">Paradise</option>
-                  <option value="Nampally">Nampally</option>
-                  <option value="MG Bus Station">MG Bus Station (MGBS)</option>
-                  <option value="LB Nagar">LB Nagar</option>
-                  <option value="Dilsukhnagar">Dilsukhnagar</option>
-                  <option value="Uppal">Uppal</option>
-                </optgroup>
-              </select>
-              <span class="select-arrow">↓</span>
-            </div>
-          </div>
+          <label for="source">Origin Station</label>
+          <select id="source">
+            <option value="" disabled selected>Select starting point...</option>
+            <optgroup label="🔴 Red Line (Miyapur ↔ LB Nagar)">
+              <option value="Miyapur">Miyapur</option>
+              <option value="JNTU College">JNTU College</option>
+              <option value="KPHB Colony">KPHB Colony</option>
+              <option value="Kukatpally">Kukatpally</option>
+              <option value="Balanagar">Balanagar</option>
+              <option value="Moosapet">Moosapet</option>
+              <option value="Bharat Nagar">Bharat Nagar</option>
+              <option value="Erragadda">Erragadda</option>
+              <option value="ESI Hospital">ESI Hospital</option>
+              <option value="S.R. Nagar">S.R. Nagar</option>
+              <option value="Ameerpet">Ameerpet (Interchange)</option>
+              <option value="Punjagutta">Punjagutta</option>
+              <option value="Irrum Manzil">Irrum Manzil</option>
+              <option value="Khairatabad">Khairatabad</option>
+              <option value="Lakdi-ka-pul">Lakdi-ka-pul</option>
+              <option value="Assembly">Assembly</option>
+              <option value="Nampally">Nampally</option>
+              <option value="Gandhi Bhavan">Gandhi Bhavan</option>
+              <option value="Osmania Medical College">Osmania Medical College</option>
+              <option value="MG Bus Station">MG Bus Station (Interchange)</option>
+              <option value="Malakpet">Malakpet</option>
+              <option value="New Market">New Market</option>
+              <option value="Musarambagh">Musarambagh</option>
+              <option value="Dilsukhnagar">Dilsukhnagar</option>
+              <option value="Chaitanyapuri">Chaitanyapuri</option>
+              <option value="Victoria Memorial">Victoria Memorial</option>
+              <option value="LB Nagar">LB Nagar</option>
+            </optgroup>
+            <optgroup label="🔵 Blue Line (Nagole ↔ Raidurg)">
+              <option value="Nagole">Nagole</option>
+              <option value="Uppal">Uppal</option>
+              <option value="Stadium">Stadium</option>
+              <option value="NGRI">NGRI</option>
+              <option value="Habsiguda">Habsiguda</option>
+              <option value="Tarnaka">Tarnaka</option>
+              <option value="Mettuguda">Mettuguda</option>
+              <option value="Secunderabad East">Secunderabad East</option>
+              <option value="Parade Ground">Parade Ground (Interchange)</option>
+              <option value="Paradise">Paradise</option>
+              <option value="Rasoolpura">Rasoolpura</option>
+              <option value="Prakash Nagar">Prakash Nagar</option>
+              <option value="Begumpet">Begumpet</option>
+              <option value="Madhura Nagar">Madhura Nagar</option>
+              <option value="Yusufguda">Yusufguda</option>
+              <option value="Road No. 5 Jubilee Hills">Road No. 5 Jubilee Hills</option>
+              <option value="Jubilee Hills Check Post">Jubilee Hills Check Post</option>
+              <option value="Peddamma Gudi">Peddamma Gudi</option>
+              <option value="Madhapur">Madhapur</option>
+              <option value="Durgam Cheruvu">Durgam Cheruvu</option>
+              <option value="HITEC City">HITEC City</option>
+              <option value="Raidurg">Raidurg</option>
+            </optgroup>
+            <optgroup label="🟢 Green Line (JBS ↔ MG Bus Station)">
+              <option value="JBS Parade Ground">JBS Parade Ground (Interchange)</option>
+              <option value="Secunderabad West">Secunderabad West</option>
+              <option value="Gandhi Hospital">Gandhi Hospital</option>
+              <option value="Musheerabad">Musheerabad</option>
+              <option value="RTC X Roads">RTC X Roads</option>
+              <option value="Chikkadpally">Chikkadpally</option>
+              <option value="Narayanaguda">Narayanaguda</option>
+              <option value="Sultan Bazaar">Sultan Bazaar</option>
+            </optgroup>
+          </select>
         </div>
 
-        <div class="time-row">
-          <span class="pref-label">DEPART:</span>
-          <div class="time-pills">
-            <button class="time-pill active" data-time="now">1️⃣ Now</button>
-            <button class="time-pill" data-time="morning">🌅 Morning Peak</button>
-            <button class="time-pill" data-time="evening">🌆 Evening Peak</button>
-            <button class="time-pill" data-time="offpeak">🌙 Off-Peak</button>
-          </div>
-        </div>
+        <button id="swapBtn" type="button" title="Swap Stations">🔄</button>
 
-        <div class="preference-row">
-          <span class="pref-label">OPTIMISE FOR:</span>
-          <div class="pref-pills">
-            <button class="pill active" data-pref="fastest">⚡ Fastest</button>
-            <button class="pill" data-pref="cheapest">₹ Cheapest</button>
-            <button class="pill" data-pref="least_crowd">👤 Least Crowded</button>
-            <button class="pill" data-pref="eco">🌿 Eco-Friendly</button>
-          </div>
+        <div class="input-group">
+          <label for="destination">Destination Station</label>
+          <select id="destination">
+            <option value="" disabled selected>Select arrival point...</option>
+            <optgroup label="🔴 Red Line (Miyapur ↔ LB Nagar)">
+              <option value="Miyapur">Miyapur</option>
+              <option value="JNTU College">JNTU College</option>
+              <option value="KPHB Colony">KPHB Colony</option>
+              <option value="Kukatpally">Kukatpally</option>
+              <option value="Balanagar">Balanagar</option>
+              <option value="Moosapet">Moosapet</option>
+              <option value="Bharat Nagar">Bharat Nagar</option>
+              <option value="Erragadda">Erragadda</option>
+              <option value="ESI Hospital">ESI Hospital</option>
+              <option value="S.R. Nagar">S.R. Nagar</option>
+              <option value="Ameerpet">Ameerpet (Interchange)</option>
+              <option value="Punjagutta">Punjagutta</option>
+              <option value="Irrum Manzil">Irrum Manzil</option>
+              <option value="Khairatabad">Khairatabad</option>
+              <option value="Lakdi-ka-pul">Lakdi-ka-pul</option>
+              <option value="Assembly">Assembly</option>
+              <option value="Nampally">Nampally</option>
+              <option value="Gandhi Bhavan">Gandhi Bhavan</option>
+              <option value="Osmania Medical College">Osmania Medical College</option>
+              <option value="MG Bus Station">MG Bus Station (Interchange)</option>
+              <option value="Malakpet">Malakpet</option>
+              <option value="New Market">New Market</option>
+              <option value="Musarambagh">Musarambagh</option>
+              <option value="Dilsukhnagar">Dilsukhnagar</option>
+              <option value="Chaitanyapuri">Chaitanyapuri</option>
+              <option value="Victoria Memorial">Victoria Memorial</option>
+              <option value="LB Nagar">LB Nagar</option>
+            </optgroup>
+            <optgroup label="🔵 Blue Line (Nagole ↔ Raidurg)">
+              <option value="Nagole">Nagole</option>
+              <option value="Uppal">Uppal</option>
+              <option value="Stadium">Stadium</option>
+              <option value="NGRI">NGRI</option>
+              <option value="Habsiguda">Habsiguda</option>
+              <option value="Tarnaka">Tarnaka</option>
+              <option value="Mettuguda">Mettuguda</option>
+              <option value="Secunderabad East">Secunderabad East</option>
+              <option value="Parade Ground">Parade Ground (Interchange)</option>
+              <option value="Paradise">Paradise</option>
+              <option value="Rasoolpura">Rasoolpura</option>
+              <option value="Prakash Nagar">Prakash Nagar</option>
+              <option value="Begumpet">Begumpet</option>
+              <option value="Madhura Nagar">Madhura Nagar</option>
+              <option value="Yusufguda">Yusufguda</option>
+              <option value="Road No. 5 Jubilee Hills">Road No. 5 Jubilee Hills</option>
+              <option value="Jubilee Hills Check Post">Jubilee Hills Check Post</option>
+              <option value="Peddamma Gudi">Peddamma Gudi</option>
+              <option value="Madhapur">Madhapur</option>
+              <option value="Durgam Cheruvu">Durgam Cheruvu</option>
+              <option value="HITEC City">HITEC City</option>
+              <option value="Raidurg">Raidurg</option>
+            </optgroup>
+            <optgroup label="🟢 Green Line (JBS ↔ MG Bus Station)">
+              <option value="JBS Parade Ground">JBS Parade Ground (Interchange)</option>
+              <option value="Secunderabad West">Secunderabad West</option>
+              <option value="Gandhi Hospital">Gandhi Hospital</option>
+              <option value="Musheerabad">Musheerabad</option>
+              <option value="RTC X Roads">RTC X Roads</option>
+              <option value="Chikkadpally">Chikkadpally</option>
+              <option value="Narayanaguda">Narayanaguda</option>
+              <option value="Sultan Bazaar">Sultan Bazaar</option>
+            </optgroup>
+          </select>
         </div>
-
-        <button class="find-btn" id="findRouteBtn">
-          <span class="btn-text">Find Best Route</span>
-          <span class="btn-arrow">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-        </button>
       </div>
+
+      <div class="options-grid">
+        <div>
+          <div class="pill-box-label">Routing Priority</div>
+          <div class="pills-container">
+            <div class="pill active" data-pref="fastest">⚡ Fastest</div>
+            <div class="pill" data-pref="cheapest">₹ Cheapest</div>
+            <div class="pill" data-pref="least_crowd">👤 Least Crowd</div>
+            <div class="pill" data-pref="eco">🌿 Eco Friendly</div>
+          </div>
+        </div>
+        <div>
+          <div class="pill-box-label">Departure Schedule</div>
+          <div class="pills-container">
+            <div class="time-pill active" data-time="now">Now</div>
+            <div class="time-pill" data-time="morning">🌅 Morning Peak</div>
+            <div class="time-pill" data-time="evening">🌆 Evening Peak</div>
+            <div class="time-pill" data-time="offpeak">⏳ Off-Peak</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="findRouteBtn" type="button">Find Optimal Route</button>
     </section>
 
-    <div class="loading-state hidden" id="loadingState">
-      <div class="loader-track"><div class="loader-train">🚇</div></div>
-      <p class="loading-text">Calculating optimal routes…</p>
-      <p class="loading-sub">Checking live crowd data & official fares</p>
-    </div>
+    <section id="loadingState" class="hidden">
+      <div class="spinner"></div>
+      <p>Crunching matrix datasets & fetching multi-modal assets...</p>
+    </section>
 
-    <section class="results-section hidden" id="resultsSection">
-      <div class="journey-banner" id="journeyBanner">
-        <div class="jb-route">
-          <span class="jb-station" id="jbFrom">—</span>
+    <section id="resultsSection" class="hidden">
+      
+      <div class="journey-banner">
+        <div class="jb-title">
+          <span id="jbFrom">--</span>
           <span class="jb-arrow">→</span>
-          <span class="jb-station" id="jbTo">—</span>
+          <span id="jbTo">--</span>
         </div>
-        <div class="jb-meta" id="jbMeta"></div>
+        <div id="jbMeta">--</div>
       </div>
 
-      <div class="section-header">
-        <h2 class="section-title">Available Routes</h2>
-        <span class="route-count" id="routeCount">— options</span>
-      </div>
-
-      <div class="fare-notice-banner" style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.18); border-radius: 10px; padding: 10px 16px; margin-bottom: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6b7a99; display: flex; align-items: center; gap: 10px;">
-        <span style="color:#38bdf8;">ℹ</span> Fares are compiled via algorithmic models corresponding to HMRL Metro (₹10–₹60 slabs) and TSRTC Bus tariffs. Metros offer a 10% smart card deduction.
-      </div>
-
-      <div class="route-cards" id="routeCards"></div>
-
-      <div class="ai-panel" id="aiPanel">
-        <div class="ai-header">
-          <div class="ai-header-left">
-            <div class="ai-icon">✦</div>
-            <span class="ai-badge">AI INSIGHTS</span>
+      <div class="results-layout">
+        <div>
+          <div class="cards-header">
+            <h3>Calculated Alternatives</h3>
+            <span id="routeCount">0 options</span>
           </div>
-          <span class="ai-model">NammaRoute Intelligence Engine</span>
+          <div id="routeCards">
+            </div>
         </div>
-        <div class="ai-body" id="aiBody"></div>
-      </div>
 
-      <div class="map-section">
-        <div class="section-header">
-          <h2 class="section-title">Route Map</h2>
-          <span class="map-legend">
-            <span class="leg leg-metro" style="color:#38bdf8">▬ Metro</span>
-            <span class="leg leg-bus" style="color:#34d399">╌ Bus</span>
-            <span class="leg leg-walk" style="color:#6b7a99">· · Walk</span>
-          </span>
-        </div>
-        <div id="map" class="map-container" style="height: 400px; border-radius:12px; margin-bottom:20px;"></div>
-      </div>
+        <div class="details-column">
+          <div id="map"></div>
 
-      <div class="journey-detail hidden" id="journeyDetail">
-        <div class="detail-header">
-          <h3 class="detail-title">Step-by-Step Journey</h3>
-          <div class="detail-actions">
-            <button class="detail-action-btn" onclick="window.print()">🖨 Print</button>
-            <button class="detail-action-btn" id="shareBtn">🔗 Share</button>
+          <div class="ai-recommendation-panel">
+            <div class="ai-header">✨ NAMMAROUTE COGNITIVE RECOMMENDATION</div>
+            <div id="aiBody">
+              </div>
+          </div>
+
+          <div id="journeyDetail" class="journey-detail-panel hidden">
+            <h4>Step-by-Step Directions</h4>
+            <div id="detailSteps">
+              </div>
           </div>
         </div>
-        <div class="detail-steps" id="detailSteps"></div>
       </div>
+
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="footer-left">
-      <span class="footer-logo">NammaRoute</span>
-      <span class="footer-desc">Hyderabad Smart City · Hybrid Routing Matrix</span>
-    </div>
-    <div class="footer-right">
-      <span class="footer-refresh">⟳ Schedules active for 2026</span>
-      <span class="footer-version">v3.0</span>
-    </div>
-  </footer>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
   <script src="script.js"></script>
 </body>
 </html>
