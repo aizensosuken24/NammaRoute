@@ -11,14 +11,10 @@
 </head>
 <body>
 
-  <!-- Animated Background -->
   <canvas id="bgCanvas" class="bg-canvas"></canvas>
   <div class="bg-gradient-overlay"></div>
-
-  <!-- Noise texture overlay -->
   <div class="noise-overlay"></div>
 
-  <!-- Header -->
   <header class="header">
     <div class="logo">
       <div class="logo-mark">
@@ -62,84 +58,62 @@
   </header>
 
   <main class="main">
-
-    <!-- Hero Section -->
     <section class="hero">
       <div class="hero-eyebrow">
         <span class="eyebrow-dot"></span>
         SMART COMMUTE PLANNER · HYDERABAD
         <span class="eyebrow-dot"></span>
       </div>
-      <h1 class="hero-title">
-        Navigate the city<br/>
-        <em>smarter.</em>
-      </h1>
+      <h1 class="hero-title">Navigate the city<br/><em>smarter.</em></h1>
       <p class="hero-sub">
-        AI-powered multi-modal routing across Metro, TSRTC Bus & combined journeys —
-        with real official fares &amp; crowd intelligence.
+        AI-powered multi-modal routing across Metro, TSRTC Bus & combined journeys — with real official fares & crowd intelligence.
       </p>
 
       <div class="hero-stats">
-        <div class="hstat">
-          <span class="hstat-val">22+</span>
-          <span class="hstat-label">Stations</span>
-        </div>
+        <div class="hstat"><span class="hstat-val">57</span><span class="hstat-label">Stations</span></div>
         <div class="hstat-divider"></div>
-        <div class="hstat">
-          <span class="hstat-val">3</span>
-          <span class="hstat-label">Metro Lines</span>
-        </div>
+        <div class="hstat"><span class="hstat-val">3</span><span class="hstat-label">Metro Lines</span></div>
         <div class="hstat-divider"></div>
-        <div class="hstat">
-          <span class="hstat-val">₹10</span>
-          <span class="hstat-label">Min Fare</span>
-        </div>
+        <div class="hstat"><span class="hstat-val">₹10</span><span class="hstat-label">Min Fare</span></div>
         <div class="hstat-divider"></div>
-        <div class="hstat">
-          <span class="hstat-val">AI</span>
-          <span class="hstat-label">Powered</span>
-        </div>
+        <div class="hstat"><span class="hstat-val">AI</span><span class="hstat-label">Powered</span></div>
       </div>
     </section>
 
-    <!-- Search Panel -->
     <section class="search-panel">
       <div class="search-card">
-
         <div class="search-card-label">PLAN YOUR JOURNEY</div>
-
         <div class="input-group">
           <div class="input-field">
-            <label class="input-label">
-              <span class="dot dot-green"></span> FROM
-            </label>
+            <label class="input-label"><span class="dot dot-green"></span> FROM</label>
             <div class="select-wrapper">
               <select id="source" class="select-input">
                 <option value="">Select Origin</option>
-                <optgroup label="West Corridor">
-                  <option value="Lingampally">Lingampally</option>
+                <optgroup label="West / IT Corridor">
                   <option value="Miyapur">Miyapur</option>
-                  <option value="JNTU">JNTU</option>
+                  <option value="JNTU College">JNTU College</option>
+                  <option value="KPHB Colony">KPHB Colony</option>
                   <option value="Kukatpally">Kukatpally</option>
                   <option value="HITEC City">HITEC City</option>
                   <option value="Raidurg">Raidurg</option>
-                  <option value="Kondapur">Kondapur</option>
-                  <option value="Gachibowli">Gachibowli</option>
+                  <option value="Gachibowli (Bus Hub)">Gachibowli</option>
+                  <option value="Kondapur (Bus Hub)">Kondapur</option>
+                  <option value="Lingampally (Bus Hub)">Lingampally</option>
                 </optgroup>
-                <optgroup label="Central">
+                <optgroup label="Central Hubs">
                   <option value="Balanagar">Balanagar</option>
                   <option value="Moosapet">Moosapet</option>
                   <option value="Bharat Nagar">Bharat Nagar</option>
                   <option value="Erragadda">Erragadda</option>
                   <option value="Ameerpet">Ameerpet</option>
-                  <option value="SR Nagar">SR Nagar</option>
+                  <option value="S.R. Nagar">S.R. Nagar</option>
                   <option value="Begumpet">Begumpet</option>
                 </optgroup>
-                <optgroup label="East / South">
-                  <option value="Secunderabad">Secunderabad</option>
+                <optgroup label="East / South / North">
+                  <option value="Secunderabad East">Secunderabad East</option>
                   <option value="Paradise">Paradise</option>
                   <option value="Nampally">Nampally</option>
-                  <option value="MGBS">MGBS</option>
+                  <option value="MG Bus Station">MG Bus Station (MGBS)</option>
                   <option value="LB Nagar">LB Nagar</option>
                   <option value="Dilsukhnagar">Dilsukhnagar</option>
                   <option value="Uppal">Uppal</option>
@@ -149,7 +123,7 @@
             </div>
           </div>
 
-          <button class="swap-btn" id="swapBtn" title="Swap source and destination">
+          <button class="swap-btn" id="swapBtn" title="Swap Route">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M5 3L5 17M5 3L2 6M5 3L8 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M15 17L15 3M15 17L12 14M15 17L18 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -157,36 +131,35 @@
           </button>
 
           <div class="input-field">
-            <label class="input-label">
-              <span class="dot dot-red"></span> TO
-            </label>
+            <label class="input-label"><span class="dot dot-red"></span> TO</label>
             <div class="select-wrapper">
               <select id="destination" class="select-input">
                 <option value="">Select Destination</option>
-                <optgroup label="West Corridor">
-                  <option value="Lingampally">Lingampally</option>
+                <optgroup label="West / IT Corridor">
                   <option value="Miyapur">Miyapur</option>
-                  <option value="JNTU">JNTU</option>
+                  <option value="JNTU College">JNTU College</option>
+                  <option value="KPHB Colony">KPHB Colony</option>
                   <option value="Kukatpally">Kukatpally</option>
                   <option value="HITEC City">HITEC City</option>
                   <option value="Raidurg">Raidurg</option>
-                  <option value="Kondapur">Kondapur</option>
-                  <option value="Gachibowli">Gachibowli</option>
+                  <option value="Gachibowli (Bus Hub)">Gachibowli</option>
+                  <option value="Kondapur (Bus Hub)">Kondapur</option>
+                  <option value="Lingampally (Bus Hub)">Lingampally</option>
                 </optgroup>
-                <optgroup label="Central">
+                <optgroup label="Central Hubs">
                   <option value="Balanagar">Balanagar</option>
                   <option value="Moosapet">Moosapet</option>
                   <option value="Bharat Nagar">Bharat Nagar</option>
                   <option value="Erragadda">Erragadda</option>
                   <option value="Ameerpet">Ameerpet</option>
-                  <option value="SR Nagar">SR Nagar</option>
+                  <option value="S.R. Nagar">S.R. Nagar</option>
                   <option value="Begumpet">Begumpet</option>
                 </optgroup>
-                <optgroup label="East / South">
-                  <option value="Secunderabad">Secunderabad</option>
+                <optgroup label="East / South / North">
+                  <option value="Secunderabad East">Secunderabad East</option>
                   <option value="Paradise">Paradise</option>
                   <option value="Nampally">Nampally</option>
-                  <option value="MGBS">MGBS</option>
+                  <option value="MG Bus Station">MG Bus Station (MGBS)</option>
                   <option value="LB Nagar">LB Nagar</option>
                   <option value="Dilsukhnagar">Dilsukhnagar</option>
                   <option value="Uppal">Uppal</option>
@@ -197,11 +170,10 @@
           </div>
         </div>
 
-        <!-- Departure Time -->
         <div class="time-row">
           <span class="pref-label">DEPART:</span>
           <div class="time-pills">
-            <button class="time-pill active" data-time="now">🕐 Now</button>
+            <button class="time-pill active" data-time="now">1️⃣ Now</button>
             <button class="time-pill" data-time="morning">🌅 Morning Peak</button>
             <button class="time-pill" data-time="evening">🌆 Evening Peak</button>
             <button class="time-pill" data-time="offpeak">🌙 Off-Peak</button>
@@ -226,23 +198,16 @@
             </svg>
           </span>
         </button>
-
       </div>
     </section>
 
-    <!-- Loading State -->
     <div class="loading-state hidden" id="loadingState">
-      <div class="loader-track">
-        <div class="loader-train">🚇</div>
-      </div>
+      <div class="loader-track"><div class="loader-train">🚇</div></div>
       <p class="loading-text">Calculating optimal routes…</p>
       <p class="loading-sub">Checking live crowd data & official fares</p>
     </div>
 
-    <!-- Results Section -->
     <section class="results-section hidden" id="resultsSection">
-
-      <!-- Journey Summary Banner -->
       <div class="journey-banner" id="journeyBanner">
         <div class="jb-route">
           <span class="jb-station" id="jbFrom">—</span>
@@ -252,65 +217,40 @@
         <div class="jb-meta" id="jbMeta"></div>
       </div>
 
-      <!-- Route Cards -->
       <div class="section-header">
         <h2 class="section-title">Available Routes</h2>
         <span class="route-count" id="routeCount">— options</span>
       </div>
 
-      <!-- Fare notice -->
-      <div style="
-        background: rgba(56,189,248,0.06);
-        border: 1px solid rgba(56,189,248,0.18);
-        border-radius: 10px;
-        padding: 10px 16px;
-        margin-bottom: 18px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        color: #6b7a99;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      ">
-        <span style="color:#38bdf8;">ℹ</span>
-        Fares are official HMRL Metro (₹10–₹60 slabs) and TSRTC Bus (₹6–₹30 slabs) rates. Smart card gives 10% metro discount.
+      <div class="fare-notice-banner" style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.18); border-radius: 10px; padding: 10px 16px; margin-bottom: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6b7a99; display: flex; align-items: center; gap: 10px;">
+        <span style="color:#38bdf8;">ℹ</span> Fares are compiled via algorithmic models corresponding to HMRL Metro (₹10–₹60 slabs) and TSRTC Bus tariffs. Metros offer a 10% smart card deduction.
       </div>
 
       <div class="route-cards" id="routeCards"></div>
 
-      <!-- AI Recommendation -->
       <div class="ai-panel" id="aiPanel">
         <div class="ai-header">
           <div class="ai-header-left">
             <div class="ai-icon">✦</div>
-            <span class="ai-badge">AI RECOMMENDATION</span>
+            <span class="ai-badge">AI INSIGHTS</span>
           </div>
-          <span class="ai-model">Claude AI</span>
+          <span class="ai-model">NammaRoute Intelligence Engine</span>
         </div>
-        <div class="ai-body" id="aiBody">
-          <div class="ai-loading">
-            <div class="ai-dots">
-              <span></span><span></span><span></span>
-            </div>
-            <span>Analysing routes…</span>
-          </div>
-        </div>
+        <div class="ai-body" id="aiBody"></div>
       </div>
 
-      <!-- Map -->
       <div class="map-section">
         <div class="section-header">
           <h2 class="section-title">Route Map</h2>
           <span class="map-legend">
-            <span class="leg leg-metro">▬ Metro</span>
-            <span class="leg leg-bus">╌ Bus</span>
-            <span class="leg leg-walk">· · Walk</span>
+            <span class="leg leg-metro" style="color:#38bdf8">▬ Metro</span>
+            <span class="leg leg-bus" style="color:#34d399">╌ Bus</span>
+            <span class="leg leg-walk" style="color:#6b7a99">· · Walk</span>
           </span>
         </div>
-        <div id="map" class="map-container"></div>
+        <div id="map" class="map-container" style="height: 400px; border-radius:12px; margin-bottom:20px;"></div>
       </div>
 
-      <!-- Journey Detail -->
       <div class="journey-detail hidden" id="journeyDetail">
         <div class="detail-header">
           <h3 class="detail-title">Step-by-Step Journey</h3>
@@ -321,18 +261,17 @@
         </div>
         <div class="detail-steps" id="detailSteps"></div>
       </div>
-
     </section>
   </main>
 
   <footer class="footer">
     <div class="footer-left">
       <span class="footer-logo">NammaRoute</span>
-      <span class="footer-desc">Hyderabad Smart City · Official HMRL & TSRTC Fares</span>
+      <span class="footer-desc">Hyderabad Smart City · Hybrid Routing Matrix</span>
     </div>
     <div class="footer-right">
-      <span class="footer-refresh">⟳ Fares updated 2024</span>
-      <span class="footer-version">v2.1</span>
+      <span class="footer-refresh">⟳ Schedules active for 2026</span>
+      <span class="footer-version">v3.0</span>
     </div>
   </footer>
 
