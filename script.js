@@ -1,7 +1,7 @@
 // ============================================
-// NammaRoute — script.js v2.1
+// NammaRoute — script.js v3.0
 // Hyderabad Smart Transit · AI-Powered Routing
-// Real HMRL Metro & TSRTC Bus Fares
+// Real HMRL Metro Fare Matrix (all 57 stations)
 // ============================================
 
 // ---- Animated Background Canvas ----
@@ -76,7 +76,6 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // ---- Nav Pills ----
-// "Live Status" → scrolls to results if available, else shows toast
 document.querySelector('[data-nav="status"]')?.addEventListener('click', () => {
   const results = document.getElementById('resultsSection');
   if (results && !results.classList.contains('hidden')) {
@@ -86,7 +85,6 @@ document.querySelector('[data-nav="status"]')?.addEventListener('click', () => {
   }
 });
 
-// "Fare Guide" → scrolls to fare guide modal
 document.querySelector('[data-nav="fares"]')?.addEventListener('click', () => {
   showFareGuide();
 });
@@ -142,33 +140,22 @@ function showFareGuide() {
       <div style="font-family:'Space Grotesk',sans-serif;">
         <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.2em; color:#3d4a65; margin-bottom:12px;">OFFICIAL FARE GUIDE</div>
         <h2 style="font-family:'Playfair Display',serif; font-size:22px; color:#e2e8f5; margin-bottom:6px; font-style:italic;">Hyderabad Transit Fares</h2>
-        <p style="font-size:12px; color:#6b7a99; margin-bottom:24px;">HMRL Metro & TSRTC Bus — Official 2024 slabs</p>
+        <p style="font-size:12px; color:#6b7a99; margin-bottom:24px;">HMRL Metro (official station-to-station matrix) & TSRTC Bus — 2024</p>
 
         <div style="margin-bottom:24px;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
             <span style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); border-radius:6px; padding:3px 10px; font-size:11px; font-weight:600; color:#38bdf8; font-family:'JetBrains Mono',monospace;">🚇 HMRL METRO</span>
           </div>
+          <p style="font-size:12px; color:#c8d1e5; margin-bottom:12px;">Fares are per official HMRL station-to-station matrix (₹10–₹75). Smart card gives 10% discount. Children under 90cm travel free.</p>
           <table style="width:100%; border-collapse:collapse; font-size:13px;">
             <thead>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.07);">
-                <th style="text-align:left; padding:8px 0; color:#6b7a99; font-weight:500;">Distance</th>
-                <th style="text-align:right; padding:8px 0; color:#6b7a99; font-weight:500;">Fare</th>
+                <th style="text-align:left; padding:8px 0; color:#6b7a99; font-weight:500;">Fare Slab</th>
+                <th style="text-align:right; padding:8px 0; color:#6b7a99; font-weight:500;">Amount</th>
               </tr>
             </thead>
             <tbody>
-              ${[
-                ['Up to 2 km', '₹10'],
-                ['2 – 4 km', '₹15'],
-                ['4 – 6 km', '₹20'],
-                ['6 – 8 km', '₹25'],
-                ['8 – 10 km', '₹30'],
-                ['10 – 12 km', '₹35'],
-                ['12 – 14 km', '₹40'],
-                ['14 – 16 km', '₹45'],
-                ['16 – 18 km', '₹50'],
-                ['18 – 21 km', '₹55'],
-                ['Above 21 km', '₹60'],
-              ].map(([d, f]) => `
+              ${[['Minimum (adjacent stations)', '₹10'], ['Short hop (2–4 stops)', '₹12–₹18'], ['Medium distance', '₹20–₹40'], ['Cross-city', '₹50–₹60'], ['End-to-end (max)', '₹75']].map(([d, f]) => `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
                   <td style="padding:9px 0; color:#c8d1e5;">${d}</td>
                   <td style="padding:9px 0; text-align:right; font-family:'JetBrains Mono',monospace; font-weight:600;
@@ -179,7 +166,6 @@ function showFareGuide() {
               `).join('')}
             </tbody>
           </table>
-          <p style="font-size:11px; color:#3d4a65; margin-top:8px;">Smart card gives 10% discount. Children under 90cm travel free.</p>
         </div>
 
         <div>
@@ -255,44 +241,170 @@ document.getElementById('swapBtn').addEventListener('click', () => {
   [src.value, dst.value] = [dst.value, src.value];
 });
 
-// ---- Station Data ----
+// ============================================
+// STATION DATA — All 57 Official HMRL Stations
+// Lines: Red (Miyapur↔LB Nagar), Blue (Nagole↔Raidurg), Green (JBS↔MG Bus Station)
+// ============================================
 const STATIONS = {
-  "Lingampally":   { lat: 17.4924, lng: 78.3182, zone: 'west' },
-  "Miyapur":       { lat: 17.4957, lng: 78.3534, zone: 'west' },
-  "JNTU":          { lat: 17.4947, lng: 78.3916, zone: 'west' },
-  "Kukatpally":    { lat: 17.4844, lng: 78.4104, zone: 'west' },
-  "Balanagar":     { lat: 17.4773, lng: 78.4379, zone: 'central' },
-  "Moosapet":      { lat: 17.4672, lng: 78.4304, zone: 'central' },
-  "Bharat Nagar":  { lat: 17.4624, lng: 78.4405, zone: 'central' },
-  "Erragadda":     { lat: 17.4617, lng: 78.4426, zone: 'central' },
-  "Ameerpet":      { lat: 17.4376, lng: 78.4482, zone: 'central' },
-  "SR Nagar":      { lat: 17.4451, lng: 78.4371, zone: 'central' },
-  "Begumpet":      { lat: 17.4432, lng: 78.4693, zone: 'central' },
-  "Secunderabad":  { lat: 17.4399, lng: 78.4983, zone: 'east' },
-  "Paradise":      { lat: 17.4459, lng: 78.4949, zone: 'east' },
-  "Nampally":      { lat: 17.3861, lng: 78.4737, zone: 'south' },
-  "MGBS":          { lat: 17.3780, lng: 78.4827, zone: 'south' },
-  "LB Nagar":      { lat: 17.3463, lng: 78.5544, zone: 'south' },
-  "Dilsukhnagar":  { lat: 17.3679, lng: 78.5265, zone: 'south' },
-  "Uppal":         { lat: 17.4050, lng: 78.5590, zone: 'east' },
-  "HITEC City":    { lat: 17.4435, lng: 78.3772, zone: 'west' },
-  "Raidurg":       { lat: 17.4271, lng: 78.3714, zone: 'west' },
-  "Kondapur":      { lat: 17.4601, lng: 78.3588, zone: 'west' },
-  "Gachibowli":    { lat: 17.4401, lng: 78.3489, zone: 'west' },
+  // ── Red Line (Miyapur ↔ LB Nagar) ──
+  "Miyapur":                  { lat: 17.4957, lng: 78.3534, line: 'red', zone: 'west' },
+  "JNTU College":             { lat: 17.4947, lng: 78.3916, line: 'red', zone: 'west' },
+  "KPHB Colony":              { lat: 17.4890, lng: 78.3994, line: 'red', zone: 'west' },
+  "Kukatpally":               { lat: 17.4844, lng: 78.4104, line: 'red', zone: 'west' },
+  "Balanagar":                { lat: 17.4773, lng: 78.4379, line: 'red', zone: 'central' },
+  "Moosapet":                 { lat: 17.4672, lng: 78.4304, line: 'red', zone: 'central' },
+  "Bharat Nagar":             { lat: 17.4624, lng: 78.4405, line: 'red', zone: 'central' },
+  "Erragadda":                { lat: 17.4617, lng: 78.4426, line: 'red', zone: 'central' },
+  "ESI Hospital":             { lat: 17.4583, lng: 78.4449, line: 'red', zone: 'central' },
+  "S.R. Nagar":               { lat: 17.4551, lng: 78.4371, line: 'red', zone: 'central' },
+  "Ameerpet":                 { lat: 17.4376, lng: 78.4482, line: 'red', zone: 'central' },
+  "Punjagutta":               { lat: 17.4314, lng: 78.4527, line: 'red', zone: 'central' },
+  "Irrum Manzil":             { lat: 17.4254, lng: 78.4540, line: 'red', zone: 'central' },
+  "Khairatabad":              { lat: 17.4197, lng: 78.4553, line: 'red', zone: 'central' },
+  "Lakdi-ka-pul":             { lat: 17.4083, lng: 78.4604, line: 'red', zone: 'south' },
+  "Assembly":                 { lat: 17.4006, lng: 78.4649, line: 'red', zone: 'south' },
+  "Nampally":                 { lat: 17.3861, lng: 78.4737, line: 'red', zone: 'south' },
+  "Gandhi Bhavan":            { lat: 17.3820, lng: 78.4769, line: 'red', zone: 'south' },
+  "Osmania Medical College":  { lat: 17.3770, lng: 78.4800, line: 'red', zone: 'south' },
+  "MG Bus Station":           { lat: 17.3780, lng: 78.4827, line: 'red', zone: 'south' },
+  "Malakpet":                 { lat: 17.3739, lng: 78.4992, line: 'red', zone: 'south' },
+  "New Market":               { lat: 17.3758, lng: 78.5062, line: 'red', zone: 'south' },
+  "Musarambagh":              { lat: 17.3770, lng: 78.5123, line: 'red', zone: 'south' },
+  "Dilsukhnagar":             { lat: 17.3679, lng: 78.5265, line: 'red', zone: 'south' },
+  "Chaitanyapuri":            { lat: 17.3614, lng: 78.5355, line: 'red', zone: 'south' },
+  "Victoria Memorial":        { lat: 17.3541, lng: 78.5444, line: 'red', zone: 'south' },
+  "LB Nagar":                 { lat: 17.3463, lng: 78.5544, line: 'red', zone: 'south' },
+
+  // ── Blue Line (Nagole ↔ Raidurg) ──
+  "Nagole":                   { lat: 17.3934, lng: 78.5611, line: 'blue', zone: 'east' },
+  "Uppal":                    { lat: 17.4050, lng: 78.5590, line: 'blue', zone: 'east' },
+  "Stadium":                  { lat: 17.4121, lng: 78.5519, line: 'blue', zone: 'east' },
+  "NGRI":                     { lat: 17.4186, lng: 78.5436, line: 'blue', zone: 'east' },
+  "Habsiguda":                { lat: 17.4262, lng: 78.5320, line: 'blue', zone: 'east' },
+  "Tarnaka":                  { lat: 17.4335, lng: 78.5209, line: 'blue', zone: 'east' },
+  "Mettuguda":                { lat: 17.4399, lng: 78.5097, line: 'blue', zone: 'east' },
+  "Secunderabad East":        { lat: 17.4432, lng: 78.5019, line: 'blue', zone: 'east' },
+  "Parade Ground":            { lat: 17.4459, lng: 78.4949, line: 'blue', zone: 'east' },
+  "Paradise":                 { lat: 17.4490, lng: 78.4880, line: 'blue', zone: 'east' },
+  "Rasoolpura":               { lat: 17.4432, lng: 78.4816, line: 'blue', zone: 'east' },
+  "Prakash Nagar":            { lat: 17.4411, lng: 78.4764, line: 'blue', zone: 'central' },
+  "Begumpet":                 { lat: 17.4432, lng: 78.4693, line: 'blue', zone: 'central' },
+  "Madhura Nagar":            { lat: 17.4412, lng: 78.4609, line: 'blue', zone: 'central' },
+  "Yusufguda":                { lat: 17.4392, lng: 78.4521, line: 'blue', zone: 'central' },
+  "Road No. 5 Jubilee Hills": { lat: 17.4343, lng: 78.4283, line: 'blue', zone: 'west' },
+  "Jubilee Hills Check Post": { lat: 17.4317, lng: 78.4116, line: 'blue', zone: 'west' },
+  "Peddamma Gudi":            { lat: 17.4309, lng: 78.3997, line: 'blue', zone: 'west' },
+  "Madhapur":                 { lat: 17.4375, lng: 78.3908, line: 'blue', zone: 'west' },
+  "Durgam Cheruvu":           { lat: 17.4378, lng: 78.3838, line: 'blue', zone: 'west' },
+  "HITEC City":               { lat: 17.4435, lng: 78.3772, line: 'blue', zone: 'west' },
+  "Raidurg":                  { lat: 17.4271, lng: 78.3714, line: 'blue', zone: 'west' },
+
+  // ── Green Line (JBS Parade Ground ↔ MG Bus Station) ──
+  "JBS Parade Ground":        { lat: 17.4459, lng: 78.4970, line: 'green', zone: 'east' },
+  "Secunderabad West":        { lat: 17.4440, lng: 78.4880, line: 'green', zone: 'east' },
+  "Gandhi Hospital":          { lat: 17.4420, lng: 78.4800, line: 'green', zone: 'central' },
+  "Musheerabad":              { lat: 17.4351, lng: 78.4743, line: 'green', zone: 'central' },
+  "RTC X Roads":              { lat: 17.4268, lng: 78.4732, line: 'green', zone: 'central' },
+  "Chikkadpally":             { lat: 17.4196, lng: 78.4721, line: 'green', zone: 'central' },
+  "Narayanaguda":             { lat: 17.4051, lng: 78.4830, line: 'green', zone: 'south' },
+  "Sultan Bazaar":            { lat: 17.3942, lng: 78.4830, line: 'green', zone: 'south' },
+  // MG Bus Station already defined above (shared terminus)
 };
 
-// ---- Haversine Distance ----
-function distance(a, b) {
-  const R = 6371;
-  const dLat = (b.lat - a.lat) * Math.PI / 180;
-  const dLng = (b.lng - a.lng) * Math.PI / 180;
-  const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+// ============================================
+// OFFICIAL HMRL FARE MATRIX
+// Source: HMRL official station-to-station fare chart (Image 1)
+// Rows = origin, Cols = destination (symmetric — same in both directions)
+// Station order matches the official fare chart exactly
+// ============================================
+
+// Station index order as per the official fare matrix
+const FARE_MATRIX_STATIONS = [
+  "Nagole","Uppal","Stadium","NGRI","Habsiguda","Tarnaka","Mettuguda","Secunderabad East",
+  "Parade Ground","Paradise","Rasoolpura","Prakash Nagar","Begumpet","Madhura Nagar","Yusufguda",
+  "Road No. 5 Jubilee Hills","Jubilee Hills Check Post","Peddamma Gudi","Madhapur","Durgam Cheruvu",
+  "HITEC City","Raidurg","Miyapur","JNTU College","KPHB Colony","Kukatpally","Balanagar","Moosapet",
+  "Bharat Nagar","Erragadda","ESI Hospital","S.R. Nagar","Ameerpet","Punjagutta","Irrum Manzil",
+  "Khairatabad","Lakdi-ka-pul","Assembly","Nampally","Gandhi Bhavan","Osmania Medical College",
+  "MG Bus Station","Malakpet","New Market","Musarambagh","Dilsukhnagar","Chaitanyapuri",
+  "Victoria Memorial","LB Nagar","JBS Parade Ground","Secunderabad West","Gandhi Hospital",
+  "Musheerabad","RTC X Roads","Chikkadpally","Narayanaguda","Sultan Bazaar"
+];
+
+// Full 57×57 fare matrix extracted from official HMRL chart
+// Values are in ₹. Matrix is symmetric (fare A→B == fare B→A)
+const FARE_MATRIX_DATA = [
+  //Nag  Upp  Std  NGR  Hab  Tar  Met  SecE Par  Rad  Ras  Pra  Beg  Mad  Yus  RN5  JHC  Ped  Mdh  Dur  HIT  Rai  Miy  JNT  KPH  Kuk  Bal  Moo  Bha  Err  ESI  SRN  Ame  Pun  Irr  Kha  Lak  Ass  Nam  GBh  OMC  MGB  Mal  New  Mus  Dil  Cha  Vic  LBN  JBS  ScW  GdH  Mus  RTC  Chi  Nar  Sul
+  [ 0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 55, 55, 60, 60, 66, 66, 66, 66, 70, 70, 75, 75, 75, 75, 75, 70, 70, 66, 66, 66, 66, 66, 70, 70, 70, 70, 70, 70, 66, 66, 66, 66, 66, 70, 70, 75, 75, 75, 50, 55, 55, 60, 60, 60, 55, 50], // Nagole
+  [12,  0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 55, 55, 60, 66, 66, 66, 66, 66, 70, 70, 75, 75, 75, 75, 70, 66, 66, 66, 66, 66, 60, 60, 66, 66, 66, 66, 66, 66, 66, 66, 70, 70, 70, 70, 75, 75, 75, 50, 55, 55, 55, 60, 60, 55, 55], // Uppal
+  [18, 12,  0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 55, 55, 60, 66, 66, 66, 66, 66, 70, 75, 75, 75, 75, 70, 66, 66, 60, 60, 60, 60, 60, 60, 66, 66, 66, 66, 66, 66, 66, 70, 70, 70, 70, 75, 75, 75, 50, 50, 55, 55, 55, 60, 55, 55], // Stadium
+  [18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 55, 60, 60, 66, 66, 66, 66, 70, 75, 75, 75, 75, 66, 66, 60, 60, 60, 60, 55, 55, 60, 60, 60, 66, 66, 66, 66, 66, 70, 70, 70, 70, 75, 75, 75, 50, 50, 50, 55, 55, 55, 55, 55], // NGRI
+  [30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 60, 60, 60, 66, 66, 66, 66, 75, 75, 75, 70, 66, 60, 60, 60, 55, 55, 55, 55, 55, 60, 60, 60, 66, 66, 66, 66, 66, 70, 70, 70, 75, 75, 75, 50, 50, 50, 50, 55, 55, 55, 55], // Habsiguda
+  [40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 40, 50, 50, 55, 60, 60, 60, 66, 66, 66, 75, 75, 75, 70, 60, 60, 55, 55, 55, 55, 50, 50, 55, 55, 60, 60, 60, 60, 66, 66, 66, 66, 70, 70, 75, 75, 75, 40, 50, 50, 50, 50, 55, 55, 55], // Tarnaka
+  [40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 30, 40, 40, 50, 55, 55, 60, 60, 60, 66, 66, 75, 75, 70, 70, 60, 55, 55, 55, 50, 50, 50, 50, 50, 55, 55, 60, 60, 60, 60, 66, 66, 66, 66, 70, 75, 75, 75, 40, 40, 50, 50, 50, 50, 55, 55], // Mettuguda
+  [40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 30, 40, 40, 50, 55, 55, 60, 60, 60, 66, 75, 75, 70, 70, 55, 55, 50, 50, 50, 50, 50, 50, 50, 50, 55, 55, 60, 60, 60, 60, 66, 66, 66, 66, 70, 75, 75, 30, 40, 40, 50, 50, 50, 55, 55], // Secunderabad East
+  [50, 40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 30, 40, 40, 50, 55, 55, 60, 60, 66, 70, 75, 70, 66, 55, 50, 50, 50, 50, 50, 40, 40, 50, 50, 55, 55, 55, 60, 60, 60, 66, 66, 66, 66, 70, 75, 75, 18, 30, 40, 40, 50, 50, 55, 55], // Parade Ground
+  [50, 50, 40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 30, 40, 40, 50, 55, 55, 60, 66, 70, 70, 70, 66, 55, 50, 50, 50, 40, 40, 40, 40, 40, 50, 55, 55, 55, 55, 60, 60, 60, 66, 66, 66, 70, 75, 75, 18, 30, 30, 40, 40, 50, 55, 55], // Paradise
+  [55, 50, 50, 40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 50, 50, 55, 55, 66, 70, 70, 66, 66, 55, 50, 50, 40, 40, 40, 40, 40, 40, 40, 50, 55, 55, 55, 55, 60, 60, 60, 66, 66, 70, 75, 75, 18, 18, 30, 40, 40, 40, 50, 55], // Rasoolpura
+  [55, 55, 50, 50, 40, 40, 30, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 50, 50, 55, 66, 70, 70, 66, 60, 55, 50, 40, 40, 40, 40, 30, 30, 40, 40, 50, 50, 55, 55, 55, 55, 60, 60, 60, 66, 70, 75, 75, 30, 18, 30, 30, 40, 40, 50, 50], // Prakash Nagar
+  [55, 55, 55, 50, 50, 40, 40, 30, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 50, 50, 60, 66, 70, 66, 60, 50, 50, 40, 40, 40, 30, 30, 30, 30, 40, 40, 50, 55, 55, 55, 55, 60, 60, 60, 66, 70, 75, 75, 30, 18, 18, 30, 30, 40, 50, 50], // Begumpet
+  [60, 55, 55, 55, 50, 50, 40, 40, 30, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 50, 55, 66, 66, 60, 60, 50, 40, 40, 40, 30, 30, 30, 30, 30, 30, 40, 50, 50, 55, 55, 55, 55, 60, 60, 66, 70, 75, 75, 40, 30, 18, 18, 30, 30, 40, 50], // Madhura Nagar
+  [60, 60, 55, 55, 55, 50, 50, 40, 40, 30, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 40, 50, 66, 66, 60, 55, 50, 40, 40, 30, 30, 30, 18, 18, 30, 30, 40, 40, 50, 50, 55, 55, 55, 55, 60, 66, 70, 75, 75, 40, 30, 30, 18, 18, 30, 40, 50], // Yusufguda
+  [66, 66, 60, 60, 60, 55, 55, 50, 40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 30, 40, 60, 60, 60, 55, 50, 40, 30, 30, 30, 30, 18, 12, 18, 18, 30, 40, 40, 50, 50, 55, 55, 55, 60, 60, 70, 75, 75, 50, 40, 40, 30, 18, 18, 30, 40], // Road No. 5 Jubilee Hills
+  [66, 66, 66, 60, 60, 60, 55, 55, 50, 40, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 40, 60, 60, 55, 55, 50, 40, 30, 30, 30, 30, 18, 18, 18, 18, 30, 30, 40, 50, 50, 50, 55, 55, 55, 60, 66, 70, 75, 50, 40, 40, 30, 30, 18, 30, 40], // Jubilee Hills Check Post
+  [66, 66, 66, 66, 60, 60, 60, 55, 55, 50, 50, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 30, 55, 55, 55, 50, 50, 40, 30, 30, 30, 30, 18, 18, 18, 18, 30, 30, 40, 40, 50, 50, 55, 55, 55, 60, 66, 70, 75, 55, 50, 40, 40, 30, 18, 30, 40], // Peddamma Gudi
+  [66, 66, 66, 66, 66, 60, 60, 60, 55, 55, 50, 50, 40, 40, 30, 18, 18, 12,  0, 12, 18, 18, 55, 55, 50, 50, 50, 40, 30, 30, 30, 30, 18, 18, 18, 18, 30, 30, 40, 40, 40, 50, 55, 55, 55, 55, 66, 70, 75, 55, 50, 50, 40, 30, 18, 30, 40], // Madhapur
+  [70, 66, 66, 66, 66, 66, 60, 60, 60, 55, 55, 50, 50, 40, 40, 30, 18, 18, 12,  0, 12, 18, 55, 55, 50, 50, 50, 40, 30, 30, 30, 30, 18, 18, 18, 18, 30, 30, 40, 40, 40, 40, 50, 55, 55, 55, 60, 66, 70, 60, 50, 50, 40, 40, 30, 30, 40], // Durgam Cheruvu
+  [70, 70, 66, 66, 66, 66, 66, 60, 60, 60, 55, 55, 50, 50, 40, 30, 30, 18, 18, 12,  0, 12, 55, 55, 50, 50, 50, 40, 30, 30, 30, 30, 18, 18, 18, 18, 30, 30, 40, 40, 40, 40, 50, 50, 55, 55, 60, 66, 70, 60, 55, 50, 50, 40, 30, 30, 40], // HITEC City
+  [75, 70, 70, 70, 66, 66, 66, 66, 66, 66, 66, 66, 60, 55, 50, 40, 40, 30, 18, 18, 12,  0, 60, 60, 55, 55, 55, 50, 40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 40, 40, 40, 40, 50, 50, 55, 55, 60, 66, 70, 66, 60, 55, 55, 50, 40, 40, 40], // Raidurg
+  [75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 66, 60, 60, 55, 55, 55, 55, 60,  0, 12, 18, 18, 30, 40, 40, 50, 50, 55, 55, 60, 60, 66, 66, 70, 70, 70, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 66, 66, 60, 60, 66], // Miyapur
+  [75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 60, 60, 55, 55, 55, 55, 60, 12,  0, 12, 18, 30, 40, 40, 50, 50, 50, 55, 55, 60, 60, 66, 66, 70, 70, 70, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 66, 66, 60, 60, 60], // JNTU College
+  [75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 66, 60, 60, 60, 55, 55, 50, 50, 50, 55, 18, 12,  0, 12, 18, 30, 40, 40, 50, 50, 50, 55, 55, 60, 60, 66, 66, 70, 70, 70, 75, 75, 75, 75, 75, 75, 75, 75, 70, 66, 66, 60, 60, 60, 60], // KPHB Colony
+  [75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 66, 60, 60, 60, 55, 55, 55, 50, 50, 50, 50, 55, 18, 18, 12,  0, 12, 18, 30, 40, 40, 50, 50, 50, 55, 55, 60, 60, 66, 66, 70, 70, 70, 75, 75, 75, 75, 75, 75, 70, 66, 66, 60, 60, 55, 60, 60], // Kukatpally
+  [70, 70, 70, 66, 66, 60, 60, 55, 55, 55, 55, 55, 50, 50, 50, 50, 50, 50, 50, 50, 50, 55, 30, 30, 18, 12,  0, 12, 18, 30, 30, 40, 40, 50, 50, 50, 55, 60, 60, 66, 66, 66, 66, 70, 70, 70, 75, 75, 75, 60, 55, 55, 55, 50, 50, 55, 60], // Balanagar
+  [70, 66, 66, 66, 60, 60, 55, 55, 50, 50, 50, 50, 50, 40, 40, 40, 40, 40, 40, 40, 40, 50, 40, 40, 30, 18, 12,  0, 12, 18, 18, 30, 30, 40, 40, 50, 55, 55, 60, 60, 66, 66, 66, 66, 70, 70, 75, 75, 75, 55, 50, 50, 50, 50, 50, 55, 60], // Moosapet
+  [66, 66, 66, 60, 60, 55, 55, 50, 50, 50, 50, 40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 40, 40, 40, 40, 30, 18, 12,  0, 12, 12, 18, 18, 30, 40, 40, 50, 55, 55, 60, 60, 60, 66, 66, 66, 70, 75, 75, 75, 55, 50, 50, 50, 50, 50, 55, 60], // Bharat Nagar
+  [66, 66, 60, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 40, 50, 50, 40, 40, 30, 18, 12,  0, 12, 12, 18, 18, 30, 40, 50, 55, 55, 55, 60, 60, 60, 66, 66, 70, 75, 75, 75, 55, 50, 50, 50, 50, 50, 55, 60], // Erragadda
+  [66, 66, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 30, 40, 50, 50, 50, 40, 30, 18, 12, 12,  0, 12, 12, 18, 30, 40, 50, 55, 55, 55, 60, 60, 60, 66, 66, 70, 75, 75, 75, 55, 50, 50, 50, 50, 50, 55, 60], // ESI Hospital
+  [66, 66, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 30, 30, 40, 55, 50, 50, 50, 40, 30, 18, 12, 12,  0, 12, 12, 18, 30, 50, 50, 55, 55, 55, 60, 60, 60, 66, 70, 75, 75, 75, 55, 50, 50, 50, 50, 50, 55, 60], // S.R. Nagar
+  [66, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 30, 30, 30, 18, 18, 18, 18, 18, 18, 18, 30, 55, 55, 50, 50, 40, 30, 18, 18, 12, 12,  0, 12, 12, 18, 40, 40, 50, 55, 55, 55, 60, 60, 66, 66, 70, 75, 75, 40, 30, 18, 30, 18, 18, 40, 50], // Ameerpet
+  [70, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 30, 30, 30, 18, 12, 18, 18, 18, 18, 18, 30, 60, 55, 55, 50, 50, 40, 30, 18, 18, 12, 12,  0, 12, 12, 30, 40, 40, 50, 55, 55, 55, 60, 60, 66, 70, 75, 75, 40, 30, 30, 18, 18, 12, 30, 50], // Punjagutta
+  [70, 66, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 30, 30, 30, 18, 18, 18, 18, 18, 18, 30, 60, 60, 55, 55, 50, 40, 40, 30, 30, 18, 12, 12,  0, 12, 30, 30, 40, 50, 55, 55, 55, 60, 60, 66, 70, 75, 75, 50, 40, 30, 30, 18, 12, 30, 40], // Irrum Manzil
+  [70, 66, 66, 60, 60, 55, 55, 50, 50, 50, 40, 40, 40, 30, 30, 18, 18, 18, 18, 18, 18, 30, 66, 60, 60, 55, 50, 50, 40, 40, 40, 30, 18, 12, 12,  0, 18, 30, 30, 40, 50, 55, 55, 55, 60, 66, 70, 75, 75, 50, 40, 40, 30, 18, 18, 30, 40], // Khairatabad
+  [70, 66, 66, 60, 60, 60, 55, 55, 55, 55, 50, 50, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 66, 66, 60, 60, 55, 55, 50, 50, 50, 50, 40, 30, 30, 18,  0, 12, 18, 30, 40, 40, 50, 55, 55, 60, 66, 70, 75, 55, 50, 50, 40, 30, 30, 18, 30], // Lakdi-ka-pul
+  [70, 66, 66, 66, 60, 60, 60, 55, 55, 55, 55, 50, 50, 50, 40, 40, 30, 30, 30, 30, 30, 30, 70, 66, 66, 60, 60, 55, 55, 55, 55, 50, 40, 40, 30, 30, 12,  0, 12, 18, 30, 40, 40, 50, 55, 60, 66, 70, 75, 55, 50, 50, 40, 40, 30, 18, 30], // Assembly
+  [70, 66, 66, 66, 66, 60, 60, 60, 55, 55, 55, 55, 55, 50, 50, 40, 40, 40, 40, 40, 40, 40, 70, 70, 66, 66, 60, 60, 55, 55, 55, 55, 50, 40, 40, 30, 18, 12,  0, 12, 18, 30, 40, 40, 50, 55, 60, 66, 70, 55, 55, 50, 50, 40, 30, 18, 30], // Nampally
+  [66, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 55, 50, 50, 50, 40, 40, 40, 40, 40, 70, 70, 70, 66, 66, 60, 60, 55, 55, 55, 55, 50, 50, 40, 30, 18, 12,  0, 12, 18, 30, 40, 40, 50, 55, 60, 66, 60, 55, 55, 50, 40, 40, 18, 18], // Gandhi Bhavan
+  [66, 66, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 55, 50, 50, 50, 40, 40, 40, 40, 75, 70, 70, 70, 66, 66, 60, 60, 60, 55, 55, 55, 55, 50, 40, 30, 18, 12,  0, 12, 18, 30, 40, 40, 55, 60, 66, 60, 55, 55, 50, 50, 40, 18, 12], // Osmania Medical College
+  [66, 66, 66, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 55, 50, 50, 50, 40, 40, 40, 75, 75, 70, 70, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 40, 40, 30, 18, 12,  0, 12, 18, 30, 40, 50, 55, 60, 60, 60, 55, 55, 50, 40, 18, 12], // MG Bus Station
+  [66, 70, 70, 70, 66, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 55, 55, 50, 50, 50, 75, 75, 75, 70, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 50, 40, 40, 30, 18, 12,  0, 12, 18, 30, 40, 50, 55, 66, 60, 60, 55, 55, 50, 30, 18], // Malakpet
+  [66, 70, 70, 70, 70, 66, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 55, 55, 55, 55, 50, 50, 75, 75, 75, 75, 70, 66, 66, 66, 66, 60, 60, 60, 60, 55, 55, 50, 40, 40, 30, 18, 12,  0, 12, 18, 30, 40, 50, 66, 60, 60, 60, 55, 50, 30, 30], // New Market
+  [70, 70, 70, 70, 70, 70, 66, 66, 66, 66, 66, 60, 60, 60, 60, 60, 55, 55, 55, 55, 55, 55, 75, 75, 75, 75, 70, 70, 66, 66, 66, 66, 66, 60, 60, 60, 55, 55, 50, 40, 40, 30, 18, 12,  0, 12, 18, 30, 40, 66, 60, 60, 60, 60, 55, 30, 30], // Musarambagh
+  [70, 70, 70, 70, 70, 70, 70, 66, 66, 66, 66, 66, 66, 66, 66, 60, 60, 60, 55, 55, 55, 55, 75, 75, 75, 75, 70, 70, 70, 70, 70, 70, 66, 66, 66, 66, 60, 60, 55, 50, 40, 40, 30, 18, 12,  0, 12, 18, 30, 70, 66, 66, 60, 60, 55, 40, 40], // Dilsukhnagar
+  [75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 70, 70, 70, 70, 70, 66, 66, 66, 60, 60, 60, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 60, 55, 55, 50, 40, 30, 18, 12,  0, 12, 18, 70, 70, 66, 66, 60, 60, 50, 50], // Chaitanyapuri
+  [75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 70, 66, 66, 66, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 66, 60, 60, 55, 50, 40, 30, 18, 12,  0, 12, 75, 70, 70, 66, 66, 60, 55, 50], // Victoria Memorial
+  [75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 70, 70, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 70, 66, 66, 60, 55, 50, 40, 30, 18, 12,  0, 75, 75, 70, 70, 66, 60, 60, 55], // LB Nagar
+  // Green Line
+  [50, 50, 50, 50, 50, 40, 40, 30, 18, 18, 18, 30, 30, 40, 40, 50, 50, 55, 55, 60, 60, 66, 75, 75, 75, 70, 60, 55, 55, 55, 55, 55, 40, 40, 50, 50, 55, 55, 55, 60, 60, 60, 66, 66, 66, 70, 70, 75, 75,  0, 12, 18, 30, 30, 40, 50, 55], // JBS Parade Ground
+  [55, 55, 50, 50, 50, 50, 40, 40, 30, 30, 18, 18, 18, 30, 30, 40, 40, 50, 50, 55, 55, 60, 70, 70, 66, 66, 55, 50, 50, 50, 50, 50, 30, 30, 40, 40, 50, 50, 55, 55, 55, 60, 60, 60, 60, 66, 70, 70, 75, 12,  0, 12, 18, 30, 30, 40, 50], // Secunderabad West
+  [55, 55, 55, 50, 50, 50, 50, 40, 40, 30, 30, 30, 18, 18, 30, 40, 40, 40, 50, 50, 50, 55, 70, 70, 66, 66, 55, 50, 50, 50, 50, 50, 18, 30, 30, 40, 50, 50, 50, 55, 55, 55, 60, 60, 60, 66, 66, 70, 70, 18, 12,  0, 12, 18, 30, 40, 50], // Gandhi Hospital
+  [60, 55, 55, 55, 50, 50, 50, 50, 40, 40, 40, 30, 30, 18, 18, 30, 30, 40, 40, 40, 50, 55, 66, 66, 66, 60, 55, 50, 50, 50, 50, 50, 30, 18, 30, 30, 40, 40, 50, 50, 50, 55, 55, 60, 60, 60, 66, 66, 70, 30, 18, 12,  0, 12, 18, 30, 40], // Musheerabad
+  [60, 60, 55, 55, 55, 50, 50, 50, 50, 40, 40, 40, 30, 30, 18, 18, 30, 30, 30, 40, 40, 50, 66, 66, 60, 60, 50, 50, 50, 50, 50, 50, 18, 18, 18, 18, 30, 40, 40, 40, 50, 50, 55, 55, 60, 60, 60, 66, 66, 30, 30, 18, 12,  0, 12, 18, 30], // RTC X Roads
+  [60, 60, 60, 55, 55, 55, 50, 50, 50, 50, 40, 40, 40, 30, 30, 18, 18, 18, 18, 30, 30, 40, 60, 60, 60, 55, 50, 50, 50, 50, 50, 50, 18, 12, 12, 18, 30, 30, 30, 40, 40, 40, 50, 50, 55, 55, 60, 60, 60, 40, 30, 30, 18, 12,  0, 12, 18], // Chikkadpally
+  [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 50, 50, 50, 40, 40, 30, 30, 30, 30, 30, 30, 40, 60, 60, 60, 60, 55, 55, 55, 55, 55, 55, 40, 30, 30, 30, 18, 18, 18, 18, 18, 18, 30, 30, 30, 40, 50, 55, 60, 50, 40, 40, 30, 18, 12,  0, 12], // Narayanaguda
+  [50, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 50, 50, 50, 50, 40, 40, 40, 40, 40, 40, 40, 66, 60, 60, 60, 60, 60, 60, 60, 60, 60, 50, 50, 40, 40, 30, 30, 30, 18, 12, 12, 18, 30, 30, 40, 50, 50, 55, 55, 50, 50, 40, 30, 18, 12,  0], // Sultan Bazaar
+];
+
+// ---- Lookup fare from matrix ----
+function getMetroFare(stationA, stationB) {
+  const i = FARE_MATRIX_STATIONS.indexOf(stationA);
+  const j = FARE_MATRIX_STATIONS.indexOf(stationB);
+  if (i === -1 || j === -1) return null; // not in matrix — use fallback
+  return FARE_MATRIX_DATA[i][j];
 }
 
-// ---- REAL HMRL Metro Fare (official 2024 slab) ----
-// Source: Hyderabad Metro Rail (HMRL) official fare chart
-function metroFare(km) {
+// ---- Fallback: distance-based fare for non-metro journeys ----
+function metroFareFallback(km) {
   if (km <= 2)  return 10;
   if (km <= 4)  return 15;
   if (km <= 6)  return 20;
@@ -303,17 +415,15 @@ function metroFare(km) {
   if (km <= 16) return 45;
   if (km <= 18) return 50;
   if (km <= 21) return 55;
-  return 60; // max fare for any distance above 21 km
+  return 60;
 }
 
 // Smart card discount (10% off, rounded to nearest ₹5)
-function metroFareSmartCard(km) {
-  const base = metroFare(km);
-  return Math.round((base * 0.9) / 5) * 5 || base - 2;
+function smartCardFare(baseFare) {
+  return Math.max(10, Math.round((baseFare * 0.9) / 5) * 5);
 }
 
-// ---- REAL TSRTC Bus Fare (official 2024 slab) ----
-// Ordinary city bus fare
+// ---- TSRTC Bus Fare ----
 function busFareOrdinary(km) {
   if (km <= 3)  return 6;
   if (km <= 6)  return 8;
@@ -324,7 +434,6 @@ function busFareOrdinary(km) {
   return 25;
 }
 
-// Metro Express / Pushpak fare
 function busFareExpress(km) {
   if (km <= 3)  return 8;
   if (km <= 6)  return 10;
@@ -335,7 +444,16 @@ function busFareExpress(km) {
   return 30;
 }
 
-// ---- Crowd Level (respects selected time) ----
+// ---- Haversine Distance ----
+function distance(a, b) {
+  const R = 6371;
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+// ---- Crowd Level ----
 function crowdLevel(type) {
   let isPeak;
   if (selectedTime === 'morning') isPeak = true;
@@ -350,9 +468,21 @@ function crowdLevel(type) {
   return 'low';
 }
 
-// ---- Save/Share: Encode route as URL param ----
+// ---- Encode route for sharing ----
 function encodeRoute(src, dst, pref) {
   return btoa(`${src}|${dst}|${pref}`);
+}
+
+// ---- Determine interchange station ----
+function getInterchange(srcStation, dstStation) {
+  const srcLine = srcStation.line;
+  const dstLine = dstStation.line;
+  if (srcLine === dstLine) return null;
+  // Red ↔ Blue interchange at Ameerpet
+  if ((srcLine === 'red' || srcLine === 'blue') && (dstLine === 'red' || dstLine === 'blue')) return 'Ameerpet';
+  // Green ↔ Red interchange at MG Bus Station or Ameerpet area
+  if (srcLine === 'green' || dstLine === 'green') return 'Ameerpet';
+  return 'Ameerpet';
 }
 
 // ---- Build Route Options ----
@@ -361,27 +491,27 @@ function buildRoutes(src, dst) {
   if (!A || !B) return [];
 
   const dist = distance(A, B);
-  // Metro route is slightly longer (not straight line), add ~15% overhead
-  const metroDist = dist * 1.15;
-  // Bus route via roads is ~25% longer
   const busDist = dist * 1.25;
-  // Combined route bus leg + metro leg
   const comboDistBus = dist * 0.55;
   const comboDistMetro = dist * 0.65;
 
-  const isNear = dist < 5;
-  const interchange = A.zone !== B.zone ? 'Ameerpet' : null;
+  const interchange = getInterchange(A, B);
 
-  // Real fares
-  const fastestFare = metroFare(metroDist);
-  const fastestFareCard = metroFareSmartCard(metroDist);
+  // ── Official metro fares from matrix ──
+  const fastestFare = getMetroFare(src, dst) ?? metroFareFallback(dist * 1.15);
+  const fastestFareCard = smartCardFare(fastestFare);
+
+  // Combo: bus leg + metro leg fares
+  const comboFare = busFareExpress(comboDistBus) + (getMetroFare(interchange || dst, dst) ?? metroFareFallback(comboDistMetro));
+  const ecoFare = fastestFare;
+
   const cheapestFare = busFareOrdinary(busDist);
   const cheapestFareExpress = busFareExpress(busDist);
-  const comboFare = busFareExpress(comboDistBus) + metroFare(comboDistMetro);
-  const ecoFare = metroFare(metroDist); // metro = most eco
-
-  // Transfer adds walking time
+  const isNear = dist < 4;
   const transferTime = interchange ? 8 : 0;
+
+  // Estimate travel time from matrix fare (higher fare ≈ more stops ≈ longer time)
+  const fareToMinutes = (fare) => Math.round(8 + fare * 0.6 + transferTime);
 
   const routes = [
     {
@@ -389,20 +519,20 @@ function buildRoutes(src, dst) {
       label: 'Fastest Route', icon: '⚡', mode: 'Metro',
       fare: fastestFare,
       fareNote: `₹${fastestFareCard} with smart card`,
-      time: Math.round(10 + metroDist * 2.2 + transferTime),
+      time: fareToMinutes(fastestFare),
       transfers: interchange ? 1 : 0,
       crowd: crowdLevel('metro'),
       co2: Math.round(dist * 42),
       tags: ['metro'],
       steps: interchange ? [
         { icon: '📍', type: 'start', name: src, desc: 'Board at origin' },
-        { icon: '🚇', type: 'metro', name: `Metro → ${interchange}`, desc: `Depart from ${src} Metro Station`, meta: `~${Math.round(metroDist/2*2.2)} min · ₹${metroFare(metroDist/2)}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${interchange}`, desc: `Depart from ${src} Metro Station`, meta: `Change line at ${interchange}` },
         { icon: '🔄', type: 'walk', name: `Transfer at ${interchange}`, desc: 'Change metro line · same platform or short walk', meta: '5–8 min' },
-        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: `Continue from ${interchange}`, meta: `~${Math.round(metroDist/2*2.2)} min · ₹${metroFare(metroDist/2)}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: `Continue from ${interchange}`, meta: `₹${fastestFare} total (₹${fastestFareCard} smart card)` },
         { icon: '🏁', type: 'end', name: dst, desc: 'You have arrived!' },
       ] : [
         { icon: '📍', type: 'start', name: src, desc: 'Board at origin' },
-        { icon: '🚇', type: 'metro', name: `Direct Metro → ${dst}`, desc: `Non-stop from ${src}`, meta: `~${Math.round(10+metroDist*2.2)} min · ₹${fastestFare} (₹${fastestFareCard} smart card)` },
+        { icon: '🚇', type: 'metro', name: `Direct Metro → ${dst}`, desc: `Non-stop from ${src}`, meta: `~${fareToMinutes(fastestFare)} min · ₹${fastestFare} (₹${fastestFareCard} smart card)` },
         { icon: '🏁', type: 'end', name: dst, desc: 'You have arrived!' },
       ],
     },
@@ -441,29 +571,29 @@ function buildRoutes(src, dst) {
         { icon: '📍', type: 'start', name: src, desc: 'Board at origin' },
         { icon: '🚌', type: 'bus', name: 'Pushpak / Metro Express Bus', desc: `Depart from ${src} — less crowded off-peak service`, meta: `~${Math.round(comboDistBus*3.2)} min · ₹${busFareExpress(comboDistBus)}` },
         { icon: '🔄', type: 'walk', name: 'Walk to Metro Station', desc: 'Short walk — typically 3–5 minutes', meta: '~4 min walk' },
-        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Less-crowded metro leg to destination', meta: `~${Math.round(comboDistMetro*2.2)} min · ₹${metroFare(comboDistMetro)}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Less-crowded metro leg to destination', meta: `~${Math.round(comboDistMetro*2.2)} min · ₹${getMetroFare(interchange || src, dst) ?? metroFareFallback(comboDistMetro)}` },
         { icon: '🏁', type: 'end', name: dst, desc: 'You have arrived!' },
       ],
     },
     {
       id: 'eco', type: 'eco',
-      label: 'Eco Route', icon: '🌿', mode: 'Metro (Green Line)',
+      label: 'Eco Route', icon: '🌿', mode: 'Metro (Lowest CO₂)',
       fare: ecoFare,
       fareNote: `~${Math.round(dist * 42)}g CO₂ saved vs auto`,
-      time: Math.round(10 + metroDist * 2.0 + transferTime),
+      time: fareToMinutes(ecoFare) - 2,
       transfers: interchange ? 1 : 0,
       crowd: crowdLevel('metro'),
       co2: Math.round(dist * 42),
       tags: ['metro'],
       steps: interchange ? [
         { icon: '📍', type: 'start', name: src, desc: 'Eco journey begins' },
-        { icon: '🚇', type: 'metro', name: `Green Metro → ${interchange}`, desc: 'HMRL Metro — lowest per-km CO₂ in Hyderabad', meta: `~${Math.round(metroDist/2*2.0)} min · ₹${metroFare(metroDist/2)}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${interchange}`, desc: 'HMRL Metro — lowest per-km CO₂ in Hyderabad', meta: `Change at ${interchange}` },
         { icon: '🔄', type: 'walk', name: `Transfer at ${interchange}`, desc: 'Station transfer', meta: '5 min' },
-        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Continue on metro', meta: `~${Math.round(metroDist/2*2.0)} min · ₹${metroFare(metroDist/2)}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Continue on metro', meta: `₹${ecoFare} total` },
         { icon: '🏁', type: 'end', name: dst, desc: `Saved ~${Math.round(dist*42*4)}g CO₂ vs auto-rickshaw!` },
       ] : [
         { icon: '📍', type: 'start', name: src, desc: 'Eco journey begins' },
-        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Hyderabad Metro: lowest carbon public transit', meta: `~${Math.round(10+metroDist*2.0)} min · ₹${ecoFare}` },
+        { icon: '🚇', type: 'metro', name: `Metro → ${dst}`, desc: 'Hyderabad Metro: lowest carbon public transit', meta: `~${fareToMinutes(ecoFare)-2} min · ₹${ecoFare}` },
         { icon: '🏁', type: 'end', name: dst, desc: `Saved ~${Math.round(dist*42*4)}g CO₂ vs auto-rickshaw!` },
       ],
     },
@@ -589,7 +719,7 @@ function initMap(src, dst, route) {
 
   const waypoints = [A];
   route.steps.forEach(step => {
-    const name = step.name.replace(/^(Metro|Bus|Ordinary Bus|Express Bus|Pushpak.*?|Green Metro) → /, '').trim();
+    const name = step.name.replace(/^(Metro|Bus|Ordinary Bus|Express Bus|Pushpak.*?|Green Metro|Direct Metro) → /, '').trim();
     if (STATIONS[name] && name !== src && name !== dst) {
       waypoints.push(STATIONS[name]);
     }
@@ -649,7 +779,7 @@ async function fetchAIRecommendation(src, dst, routes, preference) {
   }[preference] || 'I want a good balance of speed and cost.';
 
   const routeSummary = routes.map(r =>
-    `${r.label}: via ${r.mode}, ₹${r.fare} (official HMRL/TSRTC fare), ${r.time} min, ${r.crowd} crowd, ${r.transfers} transfer(s), saves ${r.co2}g CO₂ vs auto`
+    `${r.label}: via ${r.mode}, ₹${r.fare} (official HMRL/TSRTC fare from fare matrix), ${r.time} min, ${r.crowd} crowd, ${r.transfers} transfer(s), saves ${r.co2}g CO₂ vs auto`
   ).join('\n');
 
   const timeCtx = selectedTime === 'now'
@@ -661,7 +791,7 @@ A commuter wants to travel from ${src} to ${dst}.
 User preference: "${preferenceText}"
 ${timeCtx}
 
-Available routes (with official HMRL Metro and TSRTC bus fares):
+Available routes (with official HMRL Metro fare matrix fares and TSRTC bus fares):
 ${routeSummary}
 
 Give a friendly, practical recommendation in 2–3 sentences. Mention the best route by name, the official fare, travel time, and one practical Hyderabad tip (a landmark near the station, rush hour advice, or a smart card tip). Be conversational, not bullet points.`;
@@ -673,7 +803,7 @@ Give a friendly, practical recommendation in 2–3 sentences. Mention the best r
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: 'You are NammaRoute AI, a helpful Hyderabad transit assistant. Be concise, friendly, and include a local tip. Fares shown are official HMRL Metro and TSRTC fares.',
+        system: 'You are NammaRoute AI, a helpful Hyderabad transit assistant. Be concise, friendly, and include a local tip. Fares shown are from official HMRL Metro station-to-station fare matrix.',
         messages: [{ role: 'user', content: prompt }],
       }),
     });
@@ -700,11 +830,12 @@ Give a friendly, practical recommendation in 2–3 sentences. Mention the best r
 }
 
 function formatAIText(text) {
+  const stationNames = Object.keys(STATIONS).join('|');
+  const stationRegex = new RegExp(`(${stationNames})`, 'g');
   return text
     .replace(/₹\d+/g, m => `<span class="ai-highlight">${m}</span>`)
     .replace(/\d+ minutes?/g, m => `<strong>${m}</strong>`)
-    .replace(/(HITEC City|Ameerpet|Miyapur|Lingampally|Raidurg|Kukatpally|Secunderabad|Uppal|LB Nagar|Gachibowli|Paradise|Nampally|MGBS|Dilsukhnagar|Begumpet)/g,
-      m => `<strong>${m}</strong>`);
+    .replace(stationRegex, m => `<strong>${m}</strong>`);
 }
 
 // ---- Share Button ----
